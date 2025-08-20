@@ -1,0 +1,61 @@
+package com.doanth.auth_service.security.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(
+                        auth -> auth.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/auth/signup").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/auth/token/refresh").permitAll()
+                                .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .exceptionHandling(exh -> exh.authenticationEntryPoint(
+//                        (request, response, exception) -> {
+//                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, exception.getMessage());
+//                        }))
+//                .addFilterBefore(jwtFilter, AuthorizationFilter.class)
+        ;
+
+
+
+        return http.build();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    UserDetailsService customUserDetailsService() {
+        return new CustomUserDetailsService();
+    }
+
+    @Bean
+    DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(customUserDetailsService());
+        return daoAuthenticationProvider;
+    }
+}

@@ -1,0 +1,63 @@
+package com.doanth.qlbv_web.controllers;
+
+
+import com.doanth.qlbv_web.dto.SignupForm;
+import com.doanth.qlbv_web.dto.SignupResult;
+import com.doanth.qlbv_web.rabbitmq.UserCreatedNotificationProducer;
+import com.doanth.qlbv_web.serviceClient.AuthServiceClient;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
+@Controller
+public class SignupController {
+    private final AuthServiceClient authServiceClient;
+    private final UserCreatedNotificationProducer userCreatedProducer;
+
+    public SignupController(AuthServiceClient authServiceClient, UserCreatedNotificationProducer userCreatedProducer) {
+        this.authServiceClient = authServiceClient;
+        this.userCreatedProducer = userCreatedProducer;
+    }
+
+    @GetMapping("/signup")
+    public String signupPage(Model model) {
+        model.addAttribute("signupForm", new SignupForm());
+        return "signup";
+    }
+
+    @PostMapping("/signup")
+    public String processSignup(@Valid @ModelAttribute("signupForm") SignupForm form,
+                                BindingResult result, Model model) {
+
+        if (!form.getPassword().equals(form.getConfirmPassword())) {
+            result.rejectValue("confirmPassword", "error.confirmPassword", "Mật khẩu xác nhận không khớp");
+        }
+
+//        if (userService.usernameExists(form.getUsername())) {
+//            result.rejectValue("username", "error.username", "Tên đăng nhập đã tồn tại");
+//        }
+//
+//        if (userService.emailExists(form.getEmail())) {
+//            result.rejectValue("email", "error.email", "Email đã được sử dụng");
+//        }
+
+
+
+        if (result.hasErrors()) {
+            return "signup";
+        }
+
+        SignupResult msg = authServiceClient.signup(form);
+        if (msg.getStatus().equals("error")) {
+            model.addAttribute("errorMsg", msg.getMessage());
+            return "signup";
+        }
+        System.out.println(msg);
+        userCreatedProducer.sendUserCreatedMessage(msg);
+        return "redirect:/login?signup";
+    }
+}

@@ -1,0 +1,121 @@
+package com.doanth.auth_service.model;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "TAIKHOAN")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    private Integer userId;
+
+    @Column(name = "username", nullable = false, length = 50)
+    private String username;
+
+    @Column(name = "email", nullable = false, unique = true, length = 100)
+    private String email;
+
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
+
+    @Column(name = "hoten", nullable = false, length = 255)
+    private String hoten;
+
+    @Column(name = "ngaysinh", nullable = true)
+    private LocalDate ngaysinh;
+
+    @Column(name = "gioitinh", nullable = true, length = 10)
+    private String gioitinh;
+
+    @Column(name = "sdt", nullable = false, length = 11)
+    private String sdt;
+
+    @Column(name = "loai", nullable = false, length = 11)
+    private String loai;
+
+    @Column(name = "status", nullable = false, length = 11)
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getHoten() {
+        return hoten;
+    }
+
+    public void setHoten(String hoten) {
+        this.hoten = hoten;
+    }
+
+    public LocalDate getNgaysinh() {
+        return ngaysinh;
+    }
+
+    public void setNgaysinh(LocalDate ngaysinh) {
+        this.ngaysinh = ngaysinh;
+    }
+
+    public String getGioitinh() {
+        return gioitinh;
+    }
+
+    public void setGioitinh(String gioitinh) {
+        this.gioitinh = gioitinh;
+    }
+
+    public String getSdt() {
+        return sdt;
+    }
+
+    public void setSdt(String sdt) {
+        this.sdt = sdt;
+    }
+
+    public String getLoai() {
+        return loai;
+    }
+
+    public void setLoai(String loai) {
+        this.loai = loai;
+    }
+}

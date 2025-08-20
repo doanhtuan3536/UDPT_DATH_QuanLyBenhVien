@@ -1,0 +1,32 @@
+package com.doanlt.notification_service.rabbitmq;
+
+import java.util.List;
+
+public class ArticleCreateResultMessage {
+    private String message;
+    private List<String> emails;
+
+    public List<String> getEmails() {
+        return emails;
+    }
+
+    public void setEmails(List<String> emails) {
+        this.emails = emails;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return "ArticleCreateResultMessage{" +
+                "message='" + message + '\'' +
+                ", emails=" + emails +
+                '}';
+    }
+}

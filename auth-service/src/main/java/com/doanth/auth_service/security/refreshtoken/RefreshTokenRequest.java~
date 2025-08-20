@@ -1,0 +1,4 @@
+package com.doanth.auth_service.security.refreshtoken;
+
+public class RefreshTokenRequest {
+}

@@ -1,0 +1,40 @@
+package com.doanlt.notification_service.rabbitmq;
+
+public class SignupResult {
+    private String status;
+    private String message;
+    private String email;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "SignupResult{" +
+                "status='" + status + '\'' +
+                ", message='" + message + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+}

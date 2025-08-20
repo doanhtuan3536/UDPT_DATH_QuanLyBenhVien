@@ -1,0 +1,10 @@
+package com.doanth.auth_service.security;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "refresh_tokens")
+public class RefreshToken {
+    
+}
