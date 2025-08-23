@@ -21,6 +21,8 @@ public class SecurityConfig {
                         auth -> auth.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/signup").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/token/refresh").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/auth/token/validate").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/auth/token").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

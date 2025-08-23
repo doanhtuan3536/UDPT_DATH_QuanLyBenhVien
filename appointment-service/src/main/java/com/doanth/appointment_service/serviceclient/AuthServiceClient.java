@@ -1,0 +1,46 @@
+package com.doanth.appointment_service.serviceclient;
+
+import com.doanth.appointment_service.security.JwtValidationException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.impl.DefaultClaims;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
+
+@Component
+public class AuthServiceClient {
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String validateAccessTokenUrl = "http://localhost:8081/api/auth/token/validate";
+    public Claims validateAccessToken(String AccessTokenJwt) throws JwtValidationException {// URL của Auth Service
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> request = new HttpEntity<>(AccessTokenJwt, headers);
+        System.out.println(request);
+        ResponseEntity<Map<String, Object>> response = null;
+
+        try{
+            response= restTemplate.exchange(
+                    validateAccessTokenUrl, HttpMethod.POST, request, new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
+            System.out.println(response.getBody());
+//            ObjectMapper mapper = new ObjectMapper();
+
+//            return mapper.readValue(response.getBody(), Claims.class);
+            return new DefaultClaims(response.getBody());
+        }
+        catch(HttpClientErrorException e){
+//            e.printStackTrace();
+            String msg = e.getResponseBodyAsString();
+            System.out.println("AuthServiceClient validateAccessToken");
+            System.out.println(msg);
+//            if (msg.equals("Access token expired")) throw new JwtValidationException(msg, new ExpiredJwtException());
+            throw new JwtValidationException(e.getResponseBodyAs(String.class));
+        }
+    }
+}

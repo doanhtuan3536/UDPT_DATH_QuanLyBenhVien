@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.amqp.core.*;
+
+import java.time.LocalTime;
+
 @Configuration
 public class RabbitMQConfig {
 
@@ -38,5 +41,9 @@ public class RabbitMQConfig {
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(LocalTime.of(16, 0));
     }
 }

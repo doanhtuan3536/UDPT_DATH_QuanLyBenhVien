@@ -1,0 +1,69 @@
+package com.doanth.qlbv_web.dto;
+
+import java.time.LocalTime;
+
+
+
+public class Specialty {
+
+    private Integer specialtyId;
+
+    private String name;
+
+    private String daysWorkInWeek;
+
+    private LocalTime startTime;
+
+    private LocalTime endTime;
+
+    @Override
+    public String toString() {
+        return "Specialty{" +
+                "specialtyId=" + specialtyId +
+                ", name='" + name + '\'' +
+                ", daysWorkInWeek='" + daysWorkInWeek + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
+    }
+
+    public Integer getSpecialtyId() {
+        return specialtyId;
+    }
+
+    public void setSpecialtyId(Integer specialtyId) {
+        this.specialtyId = specialtyId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDaysWorkInWeek() {
+        return daysWorkInWeek;
+    }
+
+    public void setDaysWorkInWeek(String daysWorkInWeek) {
+        this.daysWorkInWeek = daysWorkInWeek;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+}

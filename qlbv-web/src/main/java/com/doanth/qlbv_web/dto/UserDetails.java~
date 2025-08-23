@@ -1,0 +1,22 @@
+package com.doanth.qlbv_web.dto;
+
+public class UserDetails {
+    private String userName;
+    private String hoten;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getHoten() {
+        return hoten;
+    }
+
+    public void setHoten(String hoten) {
+        this.hoten = hoten;
+    }
+}

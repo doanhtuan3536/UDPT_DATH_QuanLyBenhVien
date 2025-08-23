@@ -15,7 +15,6 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf(csrf -> csrf.disable()) // disable only for testing APIs
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/assets/**", "/signup").permitAll()
@@ -28,10 +27,13 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/home", true)
                         .permitAll()) // default login page
                 .logout(logout -> logout.permitAll())
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+//                .sessionManagement(session -> session
+//                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // or ALWAYS
+//                )
                 .authenticationProvider(remoteAuthProvider);
 
         return http.build();
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     }
 }

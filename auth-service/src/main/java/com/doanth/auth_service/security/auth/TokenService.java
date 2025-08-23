@@ -31,6 +31,7 @@ public class TokenService {
 
         AuthResponse response = new AuthResponse();
         response.setAccessToken(accessToken);
+        response.setUserId(user.getUserId());
 
         String randomUUID = UUID.randomUUID().toString();
 
@@ -62,14 +63,17 @@ public class TokenService {
         }
 
         if (foundRefreshToken == null)
-            throw new RefreshTokenNotFoundException();
+            throw new RefreshTokenNotFoundException("Refresh token not found");
 
         Date currentTime = new Date();
 
         if (foundRefreshToken.getExpiryTime().before(currentTime))
-            throw new RefreshTokenExpiredException();
+            throw new RefreshTokenExpiredException("Refresh token expired");
 
         AuthResponse response = generateTokens(foundRefreshToken.getUser());
+        response.setHoten(foundRefreshToken.getUser().getHoten());
+        response.setRole(foundRefreshToken.getUser().getLoai());
+        response.setUserId(foundRefreshToken.getUser().getUserId());
 
         refreshTokenRepo.delete(foundRefreshToken);
 

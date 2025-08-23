@@ -21,6 +21,7 @@ public class SecurityConfig {
                         auth -> auth.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/signup").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/token/refresh").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/auth/token/validate").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
@@ -51,7 +52,7 @@ public class SecurityConfig {
         return new CustomUserDetailsService();
     }
 
-
+    @Bean
     DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());

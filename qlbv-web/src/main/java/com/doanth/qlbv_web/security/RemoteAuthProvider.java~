@@ -1,5 +1,6 @@
 package com.doanth.qlbv_web.security;
 
+import com.doanth.qlbv_web.dto.UserDetails;
 import com.doanth.qlbv_web.serviceClient.AuthResponse;
 import com.doanth.qlbv_web.serviceClient.AuthServiceClient;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -8,9 +9,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+@Component
 public class RemoteAuthProvider implements AuthenticationProvider {
 
     private final AuthServiceClient authServiceClient;
@@ -35,9 +37,12 @@ public class RemoteAuthProvider implements AuthenticationProvider {
         try {
             AuthResponse respone = authServiceClient.login(username, password);
             System.out.println(respone);
+            UserDetails userDetails = new UserDetails();
+            userDetails.setUserName(username);
+            userDetails.setHoten(respone.getHoten());
             // Tạo principal (có thể parse token để lấy roles)
             return new UsernamePasswordAuthenticationToken(
-                    username, respone, List.of(new SimpleGrantedAuthority(respone.getRole())));
+                    userDetails, respone, List.of(new SimpleGrantedAuthority(respone.getRole())));
         } catch (Exception e) {
             throw new BadCredentialsException("Đăng nhập thất bại", e);
         }

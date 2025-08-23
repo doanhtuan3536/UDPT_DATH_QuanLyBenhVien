@@ -1,5 +1,6 @@
 package com.doanth.auth_service.security.auth;
 
+import com.doanth.auth_service.model.User;
 import com.doanth.auth_service.security.jwt.JwtUtility;
 import com.doanth.auth_service.security.refreshtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -59,14 +62,17 @@ public class TokenService {
         }
 
         if (foundRefreshToken == null)
-            throw new RefreshTokenNotFoundException();
+            throw new RefreshTokenNotFoundException("Refresh token not found");
 
         Date currentTime = new Date();
 
         if (foundRefreshToken.getExpiryTime().before(currentTime))
-            throw new RefreshTokenExpiredException();
+            throw new RefreshTokenExpiredException("Refresh token expired");
 
         AuthResponse response = generateTokens(foundRefreshToken.getUser());
+        response.setHoten(foundRefreshToken.getUser().getHoten());
+        response.setRole(foundRefreshToken.getUser().getLoai());
+        response.setUserId(foundRefreshToken.getUser().getUserId());
 
         refreshTokenRepo.delete(foundRefreshToken);
 

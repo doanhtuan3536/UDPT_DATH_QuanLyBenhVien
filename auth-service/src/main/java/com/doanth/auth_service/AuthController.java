@@ -7,10 +7,13 @@ import com.doanth.auth_service.model.User;
 import com.doanth.auth_service.security.auth.AuthResponse;
 import com.doanth.auth_service.security.auth.TokenService;
 import com.doanth.auth_service.security.config.CustomUserDetails;
+import com.doanth.auth_service.security.jwt.JwtUtility;
+import com.doanth.auth_service.security.jwt.JwtValidationException;
 import com.doanth.auth_service.security.refreshtoken.RefreshTokenExpiredException;
 import com.doanth.auth_service.security.refreshtoken.RefreshTokenNotFoundException;
 import com.doanth.auth_service.security.refreshtoken.RefreshTokenRequest;
 import com.doanth.auth_service.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,13 +36,16 @@ public class AuthController {
 //    private final JwtUtility jwtUtil;
     private final TokenService tokenService;
 
+    private final JwtUtility jwtUtil;
+
     public AuthController(PasswordEncoder passwordEncoder, UserService userService,
-                          AuthenticationManager authenticationManager, TokenService tokenService) {
+                          AuthenticationManager authenticationManager, TokenService tokenService, JwtUtility jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
 //        this.jwtUtil = jwtUtil;
         this.tokenService = tokenService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/signup")
@@ -102,7 +108,8 @@ public class AuthController {
 
             AuthResponse token = tokenService.generateTokens(customUserDetails.getUser());
             token.setRole(customUserDetails.getAuthorities().iterator().next().getAuthority());
-
+            token.setHoten(customUserDetails.getUser().getHoten());
+            System.out.println(token);
             return ResponseEntity.ok(token);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -116,8 +123,43 @@ public class AuthController {
             return ResponseEntity.ok(response);
 
         } catch (RefreshTokenNotFoundException | RefreshTokenExpiredException e) {
-
             e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+
+    @PostMapping("/token/validate")
+    public ResponseEntity<?> validateAccessToken(@RequestBody String AccessTokenJwt) {
+        System.out.println(AccessTokenJwt);
+        try {
+            Claims claims = jwtUtil.validateAccessToken(AccessTokenJwt);
+            System.out.println(claims);
+            return ResponseEntity.ok(claims);
+
+        } catch (JwtValidationException e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+
+    @PostMapping("/token")
+    public ResponseEntity<?> getNewToken(@RequestBody LoginForm body) {
+        try {
+            String username = body.getUsername();
+            String password = body.getPassword();
+
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password));
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            AuthResponse token = tokenService.generateTokens(customUserDetails.getUser());
+            token.setRole(customUserDetails.getAuthorities().iterator().next().getAuthority());
+            token.setHoten(customUserDetails.getUser().getHoten());
+            System.out.println(token);
+            return ResponseEntity.ok(token);
+        } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

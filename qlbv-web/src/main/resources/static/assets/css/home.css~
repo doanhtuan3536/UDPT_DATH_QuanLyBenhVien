@@ -1,0 +1,118 @@
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.welcome-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.welcome-section h1 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.welcome-section p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #3498db;
+}
+
+.card.appointment .card-icon {
+    color: #2ecc71;
+}
+
+.card.history .card-icon {
+    color: #9b59b6;
+}
+
+.card.PatientRecord .card-icon {
+    color: #e67e22;
+}
+
+.card h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.card p {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+}
+
+.card-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.card.appointment .card-btn {
+    background-color: #2ecc71;
+}
+
+.card.appointment .card-btn:hover {
+    background-color: #27ae60;
+}
+
+.card.history .card-btn {
+    background-color: #9b59b6;
+}
+
+.card.history .card-btn:hover {
+    background-color: #8e44ad;
+}
+
+.card.PatientRecord .card-btn {
+    background-color: #e67e22;
+}
+
+.card.PatientRecord .card-btn:hover {
+    background-color: #d35400;
+}
+
+@media (max-width: 768px) {
+    .user-info {
+        flex-direction: column;
+    }
+    .dashboard {
+                    grid-template-columns: 1fr;
+                }
+}

@@ -1,0 +1,72 @@
+package com.doanth.appointment_service.models;
+
+import jakarta.persistence.*;
+
+import java.time.LocalTime;
+@Entity
+@Table(name = "CHUYENKHOA")
+public class Specialty {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "chuyenkhoa_id")
+    private Integer specialtyId;
+    @Column(name = "tenchuyenkhoa", nullable = false, length = 100, unique = true)
+    private String name;
+    @Column(name = "ngaykhamtrongtuan", nullable = false, length = 200)
+    private String daysWorkInWeek;
+    @Column(name = "giobatdau", nullable = false)
+    private LocalTime startTime;
+    @Column(name = "gioketthuc", nullable = false)
+    private LocalTime endTime;
+
+    @Override
+    public String toString() {
+        return "Specialty{" +
+                "specialtyId=" + specialtyId +
+                ", name='" + name + '\'' +
+                ", daysWorkInWeek='" + daysWorkInWeek + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
+    }
+
+    public Integer getSpecialtyId() {
+        return specialtyId;
+    }
+
+    public void setSpecialtyId(Integer specialtyId) {
+        this.specialtyId = specialtyId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDaysWorkInWeek() {
+        return daysWorkInWeek;
+    }
+
+    public void setDaysWorkInWeek(String daysWorkInWeek) {
+        this.daysWorkInWeek = daysWorkInWeek;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+}

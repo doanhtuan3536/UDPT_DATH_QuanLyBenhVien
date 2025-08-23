@@ -8,8 +8,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.naming.Binding;
-
+import org.springframework.amqp.core.*;
 @Configuration
 public class RabbitMQConfig {
 

@@ -1,0 +1,4 @@
+package com.doanth.appointment_service.dto;
+
+public class AppointmentInfoDTO {
+}

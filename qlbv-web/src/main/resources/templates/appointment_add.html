@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Hệ thống Quản lý Bệnh viện</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/appointment_add.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            flex-grow: 1;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 5%; /* Sử dụng phần trăm để responsive tốt hơn */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info a {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .user-info a:hover {
+            background-color: #c0392b;
+        }
+
+
+
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div th:replace="header :: header">...</div>
+
+    <div class="container">
+        <a href="/home" class="back-link">
+            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+
+        <h1 class="page-title">Đặt Lịch Khám</h1>
+        <div class="booking-container">
+            <div class="booking-form">
+                <h2 class="form-title">Thông tin đặt lịch</h2>
+                <form th:action="@{/appointments/add}" method="post" th:object="${bookingForm}">
+                    <div th:if="${errorMessage}" class="alert alert-danger text-center" th:text="${errorMessage}"></div>
+                    <div th:if="${successfulMessage}" class="alert alert-success text-center" th:text="${successfulMessage}"></div>
+                    <div class="form-group">
+                        <label for="specialtyId">Chuyên khoa *</label>
+                        <select id="specialtyId" name="specialtyId" class="form-control" required th:field="*{specialtyId}">
+                            <option value="">-- Chọn chuyên khoa --</option>
+                            <option th:each="specialty : ${specialties}"
+                                    th:value="${specialty.specialtyId}"
+                                    th:text="${specialty.name}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointmentDate">Ngày khám *</label>
+                        <input type="date" id="appointmentDate" name="appointmentDate" class="form-control" required
+                               th:attr="min=${minDate}"
+                               th:field="*{appointmentDate}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Giờ khám *</label>
+                        <div class="time-inputs">
+                            <div>
+                                <label for="hour">Giờ</label>
+                                <select id="hour" name="hour" class="form-control" required>
+                                    <option value="">-- Giờ --</option>
+                                    <option th:each="h : ${#numbers.sequence(7, 17)}"
+                                            th:value="${h}"
+                                            th:text="${h}" th:selected="${bookingForm?.appointmentTime != null and bookingForm.appointmentTime.hour == h}"></option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="minute">Phút</label>
+                                <select id="minute" name="minute" class="form-control" required>
+                                    <option value="">-- Phút --</option>
+                                    <option th:each="m : ${#numbers.sequence(0, 45, 15)}"
+                                            th:value="${m < 10 ? '0' + m : m}"
+                                            th:text="${m < 10 ? '0' + m : m}"
+                                            th:selected="${bookingForm?.appointmentTime != null and bookingForm.appointmentTime.minute == m}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="note">Ghi chú (nếu có)</label>
+                        <textarea id="note" name="note" class="form-control" rows="3"
+                                  placeholder="Nhập thông tin bổ sung hoặc triệu chứng..." th:field="*{note}"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Đặt lịch ngay</button>
+                </form>
+            </div>
+
+            <div class="schedule-info">
+                <h2 class="info-title">Lịch làm việc các chuyên khoa</h2>
+                <ul class="specialty-list">
+                    <li th:each="specialty : ${specialties}" class="specialty-item">
+                        <div class="specialty-name" th:text="${specialty.name}">Tên chuyên khoa</div>
+                        <div class="specialty-schedule"
+                             th:text="${specialty.daysWorkInWeek + ' (' + specialty.startTime + ' - ' + specialty.endTime + ')'}">
+                            Lịch làm việc
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="note">
+                    <p><strong>Lưu ý khi đặt lịch:</strong></p>
+                    <ul>
+                        <li>Chỉ đặt lịch trong giờ làm việc của chuyên khoa</li>
+                        <li>Đến trước 15 phút so với giờ hẹn để làm thủ tục</li>
+                        <li>Mang theo đầy đủ giấy tờ tùy thân và thẻ BHYT (nếu có)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="footer :: footer">...</div>
+<script>
+    // Thiết lập ngày tối thiểu là ngày mai
+    document.addEventListener('DOMContentLoaded', function() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const yyyy = tomorrow.getFullYear();
+        const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const dd = String(tomorrow.getDate()).padStart(2, '0');
+
+        const minDate = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('appointmentDate').min = minDate;
+
+        // Xử lý khi chọn chuyên khoa
+        document.getElementById('specialty').addEventListener('change', function() {
+            // Có thể thêm logic để điều chỉnh giờ làm việc theo chuyên khoa
+            console.log('Chuyên khoa đã chọn:', this.value);
+        });
+    });
+</script>
+</body>
+</html>

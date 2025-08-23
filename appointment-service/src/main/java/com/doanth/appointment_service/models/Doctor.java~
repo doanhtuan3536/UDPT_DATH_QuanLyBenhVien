@@ -1,0 +1,18 @@
+package com.doanth.appointment_service.models;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "BACSI")
+public class Doctor {
+    @Id
+    @Column(name = "bacsi_id")
+    private Integer doctorId;
+
+
+    @ManyToOne
+    @JoinColumn(name = "chuyenkhoa_id")
+    private Specialty specialty;
+
+
+}
