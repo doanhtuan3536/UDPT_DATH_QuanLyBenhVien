@@ -2,8 +2,22 @@ package com.doanth.appointment_service.repository;
 
 import com.doanth.appointment_service.models.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
+public interface AppointmentRepository extends FilterableAppointmentRepository,JpaRepository<Appointment, Integer> {
+    @Query("SELECT l FROM Appointment l WHERE l.trashed = false AND l.specialty.specialtyId = ?1 AND l.status = 'resolved'")
+    public List<Appointment> findBySpecialtyIdAndStatusResolved(Integer SpecialtyId);
+
+    @Query("SELECT l FROM Appointment l WHERE l.trashed = false AND l.specialty.specialtyId = ?1 AND l.status != 'resolved'")
+    public List<Appointment> findBySpecialtyIdAndStatusNotResolved(Integer SpecialtyId);
+
+    @Query("SELECT l FROM Appointment l WHERE l.trashed = false AND l.userId = ?1 AND l.status != 'resolved'")
+    public List<Appointment> findByUserIdAndStatusNotResolved(Integer userId);
+
+    @Query("SELECT l FROM Appointment l WHERE l.trashed = false AND l.userId = ?1 AND l.status = 'resolved'")
+    public List<Appointment> findByUserIdAndStatusResolved(Integer userId);
 }

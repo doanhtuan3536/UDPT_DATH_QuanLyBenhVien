@@ -1,6 +1,9 @@
 package com.doanth.qlbv_web;
 
+import com.doanth.qlbv_web.serviceClient.AppointmentNotFoundException;
+import com.doanth.qlbv_web.serviceClient.JwtValidationException;
 import com.doanth.qlbv_web.serviceClient.RefreshTokenException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -35,7 +38,7 @@ public class GlobalExceptionHandler {
 //        SecurityContextHolder.clearContext();
         return "error";
     }
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({JwtValidationException.class, JsonProcessingException.class, })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleConstraintViolation(HttpServletRequest request, Exception ex, Model model) {
 //        ErrorDTO error = new ErrorDTO();
@@ -53,6 +56,28 @@ public class GlobalExceptionHandler {
             session.invalidate();
         }
         model.addAttribute("errorMessage", "Lỗi hệ thống, vui lòng đăng nhập lại");
+//        SecurityContextHolder.clearContext();
+        return "error";
+    }
+
+    @ExceptionHandler(AppointmentNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleAppointmentNotFoundException(HttpServletRequest request, Exception ex, Model model) {
+//        ErrorDTO error = new ErrorDTO();
+//
+//        error.setTimestamp(new Date());
+//        error.setStatus(HttpStatus.BAD_REQUEST.value());
+//        error.addError(ex.getMessage());
+//        error.setPath(request.getServletPath());
+//
+//        LOGGER.error(ex.getMessage(), ex);
+        SecurityContextHolder.clearContext();
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        model.addAttribute("errorMessage", "Lỗi hệ thống không tìm thấy lịch khám, vui lòng quay về trang home");
 //        SecurityContextHolder.clearContext();
         return "error";
     }

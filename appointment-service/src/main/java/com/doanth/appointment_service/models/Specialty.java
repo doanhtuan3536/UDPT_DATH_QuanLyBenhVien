@@ -18,6 +18,9 @@ public class Specialty {
     private LocalTime startTime;
     @Column(name = "gioketthuc", nullable = false)
     private LocalTime endTime;
+    @Column(name = "phongkham", nullable = false, length = 50)
+    private String room;
+
 
     @Override
     public String toString() {
@@ -27,7 +30,16 @@ public class Specialty {
                 ", daysWorkInWeek='" + daysWorkInWeek + '\'' +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
+                ", room='" + room + '\'' +
                 '}';
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
     }
 
     public Integer getSpecialtyId() {

@@ -150,3 +150,25 @@
 .back-link:hover {
     text-decoration: underline;
 }
+
+.navigation-links {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.view-appointments-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.view-appointments-link:hover {
+    background-color: #5a6268;
+    color: white;
+    text-decoration: none;
+}

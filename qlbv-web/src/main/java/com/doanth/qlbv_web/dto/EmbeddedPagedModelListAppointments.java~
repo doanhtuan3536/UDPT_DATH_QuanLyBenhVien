@@ -1,0 +1,42 @@
+package com.doanth.qlbv_web.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.hateoas.PagedModel.PageMetadata;
+
+import java.util.Collections;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EmbeddedPagedModelListAppointments <T> {
+    private EmbeddedWrapper<T> _embedded;
+    private PageMetadata page;
+
+    // Getters and setters
+    public List<T> getContent() {
+        return _embedded != null ? _embedded.getContent() : Collections.emptyList();
+    }
+
+    public PageMetadata getPage() {
+        return page;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class EmbeddedWrapper<T> {
+        private List<T> appointments;
+
+        public List<T> getContent() {
+            return appointments != null ? appointments : Collections.emptyList();
+        }
+    }
+
+//    @JsonIgnoreProperties(ignoreUnknown = true)
+//    public static class PageMetadata {
+//        private int size;
+//        private int totalElements;
+//        private int totalPages;
+//        private int number;
+//
+//
+//        // Getters and setters
+//    }
+}

@@ -1,32 +1,41 @@
 package com.doanth.appointment_service;
 
 import com.doanth.appointment_service.dto.AppointmentInfoDTO;
+import com.doanth.appointment_service.dto.SpecialtyInforForListAppointments;
 import com.doanth.appointment_service.models.Appointment;
 import com.doanth.appointment_service.models.Specialty;
-import com.doanth.appointment_service.service.AppointmentService;
-import com.doanth.appointment_service.service.AppointmentTimeNotBetweenWorkingHoursException;
-import com.doanth.appointment_service.service.SpecialtyService;
-import com.doanth.appointment_service.service.SpecialtyWorkDaysException;
+import com.doanth.appointment_service.security.User;
+import com.doanth.appointment_service.service.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/appointments")
+@Validated
 public class AppointmentController {
     @Autowired
     private SpecialtyService specialtyService;
     @Autowired
     private AppointmentService appointmentService;
+    @Autowired
+    private DoctorService doctorService;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -40,6 +49,64 @@ public class AppointmentController {
 //        specialty.setEndTime(LocalTime.of(17, 0, 0));
         List<Specialty> specialties = specialtyService.list(); // <1>
         return ResponseEntity.ok(specialties);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> listAppointments(@RequestParam(value = "page", required = false, defaultValue = "1")
+                                                  @Min(value = 1)	Integer page,
+
+                                              @RequestParam(value = "size", required = false, defaultValue = "5")
+                                                  @Min(value = 5) @Max(value = 20) Integer pageSize,
+
+                                              @RequestParam(value = "sort", required = false, defaultValue = "appointmentDate,appointmentTime,appointmentId") String sortOption,
+                                              @RequestParam(value = "status", required = false, defaultValue = "resolved") String status) throws BadRequestException {
+//        List<Specialty> specialties = specialtyService.list();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        String role = user.getAuthorities().iterator().next().getAuthority();
+        if(role.equals("bacsi")) {
+            Integer specialtyId = doctorService.getSpecialtyIdByDoctorId(user.getUserId());
+            SpecialtyInforForListAppointments specialty = specialtyService.getNameRoomBySpecialtyId(specialtyId);
+
+            Map<String, Object> filterFields = new java.util.HashMap<>();
+            filterFields.put("specialty.specialtyId", specialtyId);
+            Page<Appointment> appointments = null;
+            if(status.startsWith("-")) {
+                filterFields.put("ne_status", status.substring(1));
+
+                appointments = appointmentService.listByPage(page-1, pageSize, sortOption, filterFields);
+            }
+            else {
+                filterFields.put("status", status);
+                filterFields.put("doctor.doctorId", user.getUserId());
+                appointments = appointmentService.listByPage(page - 1, pageSize, sortOption, filterFields);
+            }
+            System.out.println(appointments);
+
+            List<AppointmentInfoDTO> listAppointmentsDTO = listEntity2ListDTO(appointments.getContent());
+//            List<AppointmentInfoDTO> listAppointmentsResolved = listEntity2ListDTO(resolvedAppointments);
+            listAppointmentsDTO.forEach(a -> {
+                a.setSpecialtyName(specialty.getName());
+                a.setSpecialtyRoom(specialty.getRoom());
+            });
+            var respondBody = addPageMetadataAndLinks2Collection(listAppointmentsDTO, appointments, sortOption, status);
+            System.out.println(respondBody);
+            return ResponseEntity.ok(respondBody);
+        }
+        else if(role .equals("benhnhan")) {
+//            List<Appointment> appointments = appointmentService.listBySpecialtyIdAndStatusNotResolved(user.getUserId());
+//            List<Appointment> resolvedAppointments = appointmentService.listBySpecialtyIdAndStatusResolved(user.getUserId());
+////            System.out.println(appointments);
+//
+//            List<AppointmentInfoDTO> listAppointmentsNotResolved = listEntity2ListDTO(appointments);
+//            List<AppointmentInfoDTO> listAppointmentsResolved = listEntity2ListDTO(resolvedAppointments);
+//            List<DoctorInfoDTO> specialties = new ArrayList<>(); // <1>
+//            resolvedAppointments.forEach(a -> {
+//                DoctorInfoDTO doctorInfo = new DoctorInfoDTO();
+//                doctorInfo.setHoten(a.getDoctor().get());
+//            });
+        }
+        return ResponseEntity.status(403).build();
     }
 
     @PostMapping
@@ -70,10 +137,20 @@ public class AppointmentController {
         Appointment newAppointment = dto2Entity(appointment);
         System.out.println(newAppointment);
         newAppointment.setStatus("pending");
+        newAppointment.setTrashed(false);
 
         Appointment savedAppointment = appointmentService.add(newAppointment);
 
         return ResponseEntity.ok(entity2DTO(savedAppointment));
+    }
+
+    @PutMapping("/confirm/{id}")
+    public ResponseEntity<?> confirmAppointment(@PathVariable("id") Integer appointmentId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Appointment updatedAppointment = appointmentService.updateStatusById(appointmentId, user.getUserId());
+
+        return ResponseEntity.ok(entity2DTO(updatedAppointment));
     }
 
     private String convertDayOfWeekToVietnamese(DayOfWeek day) {
@@ -89,11 +166,74 @@ public class AppointmentController {
         }
     }
 
+    private PagedModel<AppointmentInfoDTO> addPageMetadataAndLinks2Collection(
+            List<AppointmentInfoDTO> listDTO, Page<Appointment> pageInfo, String sortField,
+            String status) throws BadRequestException {
+
+        // add self link to each individual item
+//        for (AppointmentInfoDTO dto : listDTO) {
+//            dto.add(linkTo(methodOn(AppointmentController.class).getLocation(dto.getCode())).withSelfRel());
+//        }
+
+        int pageSize = pageInfo.getSize();
+        int pageNum = pageInfo.getNumber() + 1;
+        long totalElements = pageInfo.getTotalElements();
+        int totalPages = pageInfo.getTotalPages();
+
+        PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(pageSize, pageNum, totalElements);
+
+        PagedModel<AppointmentInfoDTO> collectionModel = PagedModel.of(listDTO, pageMetadata);
+
+        // add self link to collection
+//        collectionModel.add(linkTo(methodOn(AppointmentController.class)
+//                .listAppointments(pageNum, pageSize, sortField, status))
+//                .withSelfRel());
+//
+//        if (pageNum > 1) {
+//            // add link to first page if the current page is not the first one
+//            collectionModel.add(
+//                    linkTo(methodOn(AppointmentController.class)
+//                            .listAppointments(1, pageSize, sortField, status))
+//                            .withRel(IanaLinkRelations.FIRST));
+//
+//            // add link to the previous page if the current page is not the first one
+//            collectionModel.add(
+//                    linkTo(methodOn(AppointmentController.class)
+//                            .listAppointments(pageNum - 1, pageSize, sortField, status))
+//                            .withRel(IanaLinkRelations.PREV));
+//        }
+//
+//        if (pageNum < totalPages) {
+//            // add link to next page if the current page is not the last one
+//            collectionModel.add(
+//                    linkTo(methodOn(AppointmentController.class)
+//                            .listAppointments(pageNum + 1, pageSize, sortField, status))
+//                            .withRel(IanaLinkRelations.NEXT));
+//
+//            // add link to last page if the current page is not the last one
+//            collectionModel.add(
+//                    linkTo(methodOn(AppointmentController.class)
+//                            .listAppointments(totalPages, pageSize, sortField, status))
+//                            .withRel(IanaLinkRelations.LAST));
+//        }
+
+
+        return collectionModel;
+
+    }
+
+
     private AppointmentInfoDTO entity2DTO(Appointment entity) {
         return modelMapper.map(entity, AppointmentInfoDTO.class);
     }
 
     private Appointment dto2Entity(AppointmentInfoDTO dto) {
         return modelMapper.map(dto, Appointment.class);
+    }
+    private List<AppointmentInfoDTO> listEntity2ListDTO(List<Appointment> listEntity) {
+
+        return listEntity.stream().map(entity -> entity2DTO(entity))
+                .collect(Collectors.toList());
+
     }
 }

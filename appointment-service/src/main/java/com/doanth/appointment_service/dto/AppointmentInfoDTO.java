@@ -1,15 +1,44 @@
 package com.doanth.appointment_service.dto;
 
+import org.springframework.hateoas.server.core.Relation;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-public class AppointmentInfoDTO {
+@Relation(collectionRelation = "appointments")
+public class AppointmentInfoDTO{
     private Integer appointmentId;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
     private String note;
     private Integer specialtyId;
     private Integer userId;
+    private String status;
+    private String specialtyName;
+    private String specialtyRoom;
+
+    public String getSpecialtyName() {
+        return specialtyName;
+    }
+
+    public void setSpecialtyName(String specialtyName) {
+        this.specialtyName = specialtyName;
+    }
+
+    public String getSpecialtyRoom() {
+        return specialtyRoom;
+    }
+
+    public void setSpecialtyRoom(String specialtyRoom) {
+        this.specialtyRoom = specialtyRoom;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Integer getAppointmentId() {
         return appointmentId;
@@ -68,6 +97,9 @@ public class AppointmentInfoDTO {
                 ", note='" + note + '\'' +
                 ", specialtyId=" + specialtyId +
                 ", userId=" + userId +
+                ", status='" + status + '\'' +
+                ", specialtyName='" + specialtyName + '\'' +
+                ", specialtyRoom='" + specialtyRoom + '\'' +
                 '}';
     }
 }

@@ -1,0 +1,11 @@
+package com.doanth.appointment_service.dto;
+
+import java.util.List;
+
+public class ListAppointmentInfoDTO {
+    private List<AppointmentInfoDTO> listAppointmentsResovled;
+    private List<AppointmentInfoDTO> listAppointmentsNotResovled;
+    private List<DoctorDTO> listDoctors;
+
+
+}

@@ -1,8 +1,16 @@
 package com.doanth.appointment_service.service;
 
 import com.doanth.appointment_service.models.Appointment;
+import com.doanth.appointment_service.models.Doctor;
 import com.doanth.appointment_service.repository.AppointmentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class AppointmentService {
@@ -14,5 +22,69 @@ public class AppointmentService {
 
     public Appointment add(Appointment appointment) {
         return repo.save(appointment);
+    }
+
+    public List<Appointment> listBySpecialtyIdAndStatusResolved(Integer specialtyId) {
+        return repo.findBySpecialtyIdAndStatusResolved(specialtyId);
+    }
+
+    public List<Appointment> listBySpecialtyIdAndStatusNotResolved(Integer specialtyId) {
+        return repo.findBySpecialtyIdAndStatusNotResolved(specialtyId);
+    }
+
+    public List<Appointment> listByUserIdAndStatusNotResolved(Integer userId) {
+        return repo.findByUserIdAndStatusNotResolved(userId);
+    }
+
+    public List<Appointment> listByUserIdAndStatusResolved(Integer userId) {
+        return repo.findByUserIdAndStatusResolved(userId);
+    }
+
+    public Page<Appointment> listByPage(int pageNum, int pageSize, String sortOption, Map<String, Object> filterFields) {
+        Sort sort = createMultipleSorts(sortOption);
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+        return repo.listWithFilter(pageable, filterFields);
+    }
+    private Sort createMultipleSorts(String sortOption) {
+        String[] sortFields = sortOption.split(",");
+
+        Sort sort = null;
+
+        if (sortFields.length > 1) { // sorted by multiple fields
+
+            sort = createSingleSort(sortFields[0]);
+
+            for (int i = 1; i < sortFields.length; i++) {
+
+                sort = sort.and(createSingleSort(sortFields[i]));
+            }
+
+        } else { // sorted by a single field
+            sort = createSingleSort(sortOption);
+        }
+        return sort;
+    }
+
+    private Sort createSingleSort(String fieldName) {
+        String actualFieldName = fieldName.replace("-", "");
+        return fieldName.startsWith("-")
+                ? Sort.by(actualFieldName).descending() : Sort.by(actualFieldName).ascending();
+    }
+
+    public Appointment updateStatusById(int appointmentId, int doctorId) {
+
+        Appointment appointmentInDB = repo.findById(appointmentId).orElse(null);
+
+        if (appointmentInDB == null) {
+            throw new AppointmentNotFoundException(appointmentId);
+        }
+        System.out.println("before");
+        appointmentInDB.setStatus("resolved");
+        appointmentInDB.setDoctor(new Doctor());
+        appointmentInDB.getDoctor().setDoctorId(doctorId);
+        System.out.println("updateStatusById updated status for appointment " + appointmentId);
+        return repo.save(appointmentInDB);
     }
 }

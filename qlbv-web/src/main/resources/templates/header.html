@@ -1,7 +1,8 @@
 <header class="header" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
     <a href="/home" style="text-decoration: none; color: white" class="logo">Hệ thống Quản lý Bệnh viện</a>
     <div class="user-info" sec:authorize="isAuthenticated()">
-        <span th:text="'Xin chào, ' + (${#authentication.principal.hoten} ?: ${#authentication.principal.userName})"></span>
+        <span th:text="'Xin chào, ' + (${#authentication.principal.authResponse.role == 'bacsi'} ? 'Bác sĩ ' : '')
+        + (${#authentication.principal.hoten} ?: ${#authentication.principal.userName})"></span>
         <a href="/logout">Đăng xuất</a>
     </div>
 </header>

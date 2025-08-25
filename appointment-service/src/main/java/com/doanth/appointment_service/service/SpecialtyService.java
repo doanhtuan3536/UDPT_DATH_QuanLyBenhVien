@@ -1,5 +1,6 @@
 package com.doanth.appointment_service.service;
 
+import com.doanth.appointment_service.dto.SpecialtyInforForListAppointments;
 import com.doanth.appointment_service.models.Specialty;
 import com.doanth.appointment_service.repository.SpecialtyRepository;
 import org.springframework.stereotype.Service;
@@ -20,5 +21,9 @@ public class SpecialtyService {
     public Specialty get(Integer specialtyId)  {
        Specialty specialtyFromDB = repo.findById(specialtyId).orElseThrow(() -> new SpecialtyNotFoundException(specialtyId));
         return specialtyFromDB;
+    }
+
+    public SpecialtyInforForListAppointments getNameRoomBySpecialtyId(Integer specialtyId)  {
+        return repo.findNameRoomBySpecialtyId(specialtyId);
     }
 }

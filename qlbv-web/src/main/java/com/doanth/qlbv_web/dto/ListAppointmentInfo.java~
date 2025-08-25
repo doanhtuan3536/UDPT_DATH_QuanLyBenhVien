@@ -1,0 +1,13 @@
+package com.doanth.qlbv_web.dto;
+
+import org.springframework.hateoas.PagedModel.PageMetadata;
+
+import java.util.List;
+
+public class ListAppointmentInfo {
+    private List<AppointmentInfo> listAppointments;
+    private List<DoctorDTO> listDoctors;
+    private PageMetadata pageMetadata;
+
+
+}

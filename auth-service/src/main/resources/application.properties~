@@ -13,10 +13,10 @@ app.security.jwt.issuer=Nhom9 Company
 app.security.jwt.secret=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuv+9-$!*&%
 
 
-app.security.jwt.access-token.expiration=1
+app.security.jwt.access-token.expiration=10
 
 
-app.security.jwt.refresh-token.expiration=2
+app.security.jwt.refresh-token.expiration=60
 
 
 app.refresh-token.removal.interval=1800000

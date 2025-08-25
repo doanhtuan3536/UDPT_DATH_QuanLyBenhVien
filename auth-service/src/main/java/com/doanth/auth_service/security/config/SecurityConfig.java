@@ -1,5 +1,7 @@
 package com.doanth.auth_service.security.config;
 
+import com.doanth.auth_service.security.jwt.JwtTokenFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,8 +14,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 @Configuration
 public class SecurityConfig {
+    @Autowired
+    JwtTokenFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -23,6 +28,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/api/auth/token/refresh").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/token/validate").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/auth/token").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/auth/user/*")
+                                .hasAnyAuthority("nhanvien", "bacsi", "benhnhan")
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())

@@ -87,9 +87,17 @@
     <div th:replace="header :: header">...</div>
 
     <div class="container">
-        <a href="/home" class="back-link">
-            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
-        </a>
+<!--        <a href="/home" class="back-link">-->
+<!--            <i class="fas fa-arrow-left"></i> Quay lại trang chủ-->
+<!--        </a>-->
+        <div class="navigation-links">
+            <a href="/home" class="back-link">
+                <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+            </a>
+            <a href="/appointments" class="view-appointments-link">
+                <i class="fas fa-list"></i> Xem lịch khám đã đặt
+            </a>
+        </div>
 
         <h1 class="page-title">Đặt Lịch Khám</h1>
         <div class="booking-container">

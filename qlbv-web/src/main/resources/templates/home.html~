@@ -106,11 +106,11 @@
                 <a href="/appointments/add" class="card-btn">Đặt lịch ngay</a>
             </div>
 
-            <div class="card history">
+            <div class="card history" sec:authorize="isAuthenticated()">
                 <div class="card-icon">📋</div>
-                <h2>Lịch sử đặt khám</h2>
-                <p>Xem lại các lịch khám đã đặt và trạng thái của chúng (đã chấp thuận/chưa chấp thuận)</p>
-                <a href="/appointments/history" class="card-btn">Xem lịch sử</a>
+                <h2 th:text="${#authentication.principal.authResponse.role == 'benhnhan'} ? 'Lịch sử đặt khám' : 'Lịch bệnh nhân đặt khám'"></h2>
+                <p>Xem lại các lịch khám đã đặt và trạng thái của chúng (đã xác nhận/chưa xác nhận)</p>
+                <a href="/appointments" class="card-btn">Xem lịch sử</a>
             </div>
 
             <div class="card PatientRecord">

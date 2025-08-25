@@ -1,5 +1,6 @@
 package com.doanth.appointment_service.security;
 
+import com.doanth.appointment_service.service.AppointmentNotFoundException;
 import com.doanth.appointment_service.service.AppointmentTimeNotBetweenWorkingHoursException;
 import com.doanth.appointment_service.service.SpecialtyNotFoundException;
 import com.doanth.appointment_service.service.SpecialtyWorkDaysException;
@@ -31,6 +32,19 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorDTO handleMakeAppointmentException(HttpServletRequest request, Exception ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        error.setTimestamp(new Date());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.addError(ex.getMessage());
+        error.setPath(request.getServletPath());
+        return error;
+    }
+
+    @ExceptionHandler(AppointmentNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleAppointmentNotFoundException(HttpServletRequest request, Exception ex) {
         ErrorDTO error = new ErrorDTO();
 
         error.setTimestamp(new Date());

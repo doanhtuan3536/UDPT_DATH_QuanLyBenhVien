@@ -1,6 +1,9 @@
 package com.doanth.appointment_service.security;
 
+import com.doanth.appointment_service.service.AppointmentNotFoundException;
+import com.doanth.appointment_service.service.AppointmentTimeNotBetweenWorkingHoursException;
 import com.doanth.appointment_service.service.SpecialtyNotFoundException;
+import com.doanth.appointment_service.service.SpecialtyWorkDaysException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,10 +28,23 @@ public class GlobalExceptionHandler {
         return error;
     }
 
-    @ExceptionHandler(SpecialtyNotFoundException.class)
+    @ExceptionHandler({SpecialtyNotFoundException.class, SpecialtyWorkDaysException.class, AppointmentTimeNotBetweenWorkingHoursException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorDTO handleMakeAppointmentException(HttpServletRequest request, Exception ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        error.setTimestamp(new Date());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.addError(ex.getMessage());
+        error.setPath(request.getServletPath());
+        return error;
+    }
+
+    @ExceptionHandler(AppointmentNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleAppointmentNotFoundExceptionException(HttpServletRequest request, Exception ex) {
         ErrorDTO error = new ErrorDTO();
 
         error.setTimestamp(new Date());

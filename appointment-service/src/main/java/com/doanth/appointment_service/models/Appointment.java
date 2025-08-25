@@ -29,13 +29,25 @@ public class Appointment {
     @Column(name = "benhnhan_id", nullable = false)
     private Integer userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chuyenkhoa_id")
     private Specialty specialty;
 
     @ManyToOne
     @JoinColumn(name = "bacsi_id")
     private Doctor doctor;
+
+
+
+    private boolean trashed;
+
+    public boolean isTrashed() {
+        return trashed;
+    }
+
+    public void setTrashed(boolean trashed) {
+        this.trashed = trashed;
+    }
 
     public Doctor getDoctor() {
         return doctor;
@@ -112,6 +124,7 @@ public class Appointment {
                 ", userId=" + userId +
                 ", specialty=" + specialty +
                 ", doctor=" + doctor +
+                ", trashed=" + trashed +
                 '}';
     }
 }

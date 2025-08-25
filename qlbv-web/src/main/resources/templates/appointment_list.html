@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Hệ thống Quản lý Bệnh viện</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/appointment_list.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            flex-grow: 1;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 5%; /* Sử dụng phần trăm để responsive tốt hơn */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info a {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .user-info a:hover {
+            background-color: #c0392b;
+        }
+
+
+
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div th:replace="header :: header">...</div>
+
+    <div class="container">
+        <a href="/home" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+
+        <h1 class="page-title" th:text="${#authentication.principal.authResponse.role == 'benhnhan'} ? 'Lịch sử đặt khám' : 'Lịch bệnh nhân đặt khám'">Lịch sử đặt khám</h1>
+
+        <div class="actions-container" th:if="${#authentication.principal.authResponse.role == 'benhnhan'}">
+            <a href="/appointments/add" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Đặt lịch khám mới
+            </a>
+
+            <button class="btn btn-danger" id="deleteExpiredBtn">
+                <i class="fas fa-trash"></i> Xóa tất cả lịch hết hạn
+            </button>
+        </div>
+
+        <!-- Phần lịch khám đã hoàn thành (resolved) - HIỂN THỊ TRÊN CÙNG -->
+        <h2 class="section-title">
+            <i class="fas fa-check-circle"></i> Lịch khám đã xác nhận
+        </h2>
+
+        <div class="page-info" th:if="${resolvedAppointments != null and !resolvedAppointments.empty}">
+            Hiển thị <span th:text="${resolvedAppointments.size()}"></span> trên tổng số
+            <span th:text="${resolvedPageMetadata.totalElements}"></span> lịch khám đã hoàn thành
+        </div>
+        <div class="page-info" th:if="${resolvedAppointments == null or resolvedAppointments.empty}">
+            Không có lịch khám đã xác nhận
+        </div>
+
+        <table class="appointments-table" th:if="${resolvedAppointments != null and !resolvedAppointments.empty}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ngày khám</th>
+                <th>Thứ</th>
+                <th>Giờ khám</th>
+                <th>Chuyên khoa</th>
+                <th>Phòng</th>
+                <th>Ghi chú</th>
+                <th>Trạng thái</th>
+                <th  th:if="${#authentication.principal.authResponse.role == 'bacsi'}">Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="appointment : ${resolvedAppointments}">
+                <td th:text="${appointment.appointmentId}">#APT001</td>
+                <td th:text="${#temporals.format(appointment.appointmentDate, 'dd/MM/yyyy')}">15/08/2023</td>
+                <td th:text="${dateUtils.getVietnameseDayOfWeek(appointment.appointmentDate)}">Thứ Ba</td>
+                <td th:text="${#temporals.format(appointment.appointmentTime, 'HH:mm')}">09:30</td>
+                <td th:text="${appointment.specialtyName}">Nội Tim mạch</td>
+                <td th:text="${appointment.specialtyRoom}">P.301</td>
+                <td th:text="${appointment.note}">Khám huyết áp và tim mạch định kỳ</td>
+                <td>
+                    <span class="status-badge status-resolved" th:text="${appointment.status == 'resolved' ? 'Đã xác nhận' : 'Chờ xác nhận'}">Đã xác nhận</span>
+                </td>
+                <td th:if="${#authentication.principal.authResponse.role == 'bacsi' and
+                dateUtils.isAppointmentInFuture(appointment.appointmentDate, appointment.appointmentTime)}">
+                    <button type="button" class="btn btn-action btn-warning">
+                        <a th:href="@{'/appointments/notconfirm/' + ${appointment.appointmentId}}"
+                           style="text-decoration: none; color: white">Hủy xác nhận</a>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="doctor-info-container" sec:authorize="isAuthenticated() and (#authentication.principal.authResponse.role == 'benhnhan')">
+            <div class="doctor-info">
+                <h4>Thông tin bác sĩ khám (cho lịch #APT001)</h4>
+                <div class="doctor-details">
+                    <div class="doctor-detail">
+                        <label>Họ tên:</label>
+                        <span>BS. Trần Văn B</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>Ngày sinh:</label>
+                        <span>15/05/1980</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>SĐT:</label>
+                        <span>0909123456</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>Giới tính:</label>
+                        <span>Nam</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>Email:</label>
+                        <span>tranvanb@hospital.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="doctor-info">
+                <h4>Thông tin bác sĩ khám (cho lịch #APT005)</h4>
+                <div class="doctor-details">
+                    <div class="doctor-detail">
+                        <label>Họ tên:</label>
+                        <span>BS. Lê Thị C</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>Ngày sinh:</label>
+                        <span>20/11/1985</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>SĐT:</label>
+                        <span>0909876543</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>Giới tính:</label>
+                        <span>Nữ</span>
+                    </div>
+                    <div class="doctor-detail">
+                        <label>Email:</label>
+                        <span>lethic@hospital.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Phân trang cho lịch đã hoàn thành -->
+        <div class="pagination-container" th:if="${resolvedPageMetadata.totalPages > 1}">
+            <ul class="pagination">
+                <li th:class="${currentPageResolved == 1} ? 'disabled' : ''">
+                    <a th:href="@{/appointments(pageForResolved=${currentPageResolved - 1}, sizeForResolved=${pageSizeResolved})}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(1, resolvedPageMetadata.totalPages)}"
+                    th:class="${i == currentPageResolved} ? 'active' : ''">
+                    <a th:href="@{/appointments(pageForResolved=${i}, sizeForResolved=${pageSizeResolved})}"
+                       th:text="${i}">1</a>
+                </li>
+                <li th:class="${currentPageResolved == resolvedPageMetadata.totalPages} ? 'disabled' : ''">
+                    <a th:href="@{/appointments(pageForResolved=${currentPageResolved + 1}, sizeForResolved=${pageSizeResolved})}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Phần lịch khám chưa hoàn thành (pending, expired) - HIỂN THỊ PHÍA DƯỚI -->
+        <h2 class="section-title">
+            <i class="fas fa-clock"></i> Lịch khám chưa xác nhận
+        </h2>
+
+        <div class="page-info" th:if="${notResolvedAppointments != null and !notResolvedAppointments.empty}">
+            Hiển thị <span th:text="${notResolvedAppointments.size()}"></span> trên tổng số
+            <span th:text="${notResolvedPageMetadata.totalElements}"></span> lịch khám chưa hoàn thành
+        </div>
+        <div class="page-info" th:if="${notResolvedAppointments == null or notResolvedAppointments.empty}">
+            Không có lịch khám chưa xác nhận
+        </div>
+
+        <table class="appointments-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ngày khám</th>
+                <th>Thứ</th>
+                <th>Giờ khám</th>
+                <th>Chuyên khoa</th>
+                <th>Phòng</th>
+                <th>Ghi chú</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="appointment : ${notResolvedAppointments}">
+                <td th:text="${appointment.appointmentId}">#APT002</td>
+                <td th:text="${#temporals.format(appointment.appointmentDate, 'dd/MM/yyyy')}">20/08/2023</td>
+                <td th:text="${dateUtils.getVietnameseDayOfWeek(appointment.appointmentDate)}">Thứ Ba</td>
+                <td th:text="${#temporals.format(appointment.appointmentTime, 'HH:mm')}">14:00</td>
+                <td th:text="${appointment.specialtyName}">Tai Mũi Họng</td>
+                <td th:text="${appointment.specialtyRoom}">P.205</td>
+                <td th:text="${appointment.note}">Đau họng kéo dài</td>
+                <td>
+                    <span th:if="${appointment.status == 'pending'}"
+                          class="status-badge status-pending">Chờ xác nhận</span>
+                    <span th:if="${appointment.status == 'expired'}"
+                          class="status-badge status-expired">Hết hạn</span>
+                </td>
+                <td>
+                    <button th:if="${#authentication.principal.authResponse.role == 'bacsi' and appointment.status == 'pending'}"
+                            type="button" class="btn btn-action btn-warning">
+                        <a th:href="@{'/appointments/confirm/' + ${appointment.appointmentId}}"
+                           style="text-decoration: none; color: white">Xác nhận</a>
+                    </button>
+                    <button th:if="${#authentication.principal.authResponse.role == 'benhnhan'}"
+                            type="button" class="btn btn-action btn-delete">
+                        <a th:href="@{'/appointments/delete/' + ${appointment.appointmentId}}"
+                           style="text-decoration: none; color: white">Xóa</a>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pagination-container" th:if="${notResolvedPageMetadata.totalPages > 1}">
+            <ul class="pagination">
+                <li th:class="${currentPageNotResolved == 1} ? 'disabled' : ''">
+                    <a th:href="@{/appointments(pageForNotResolved=${currentPageNotResolved - 1}, sizeForNotResolved=${pageSizeNotResolved})}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(1, notResolvedPageMetadata.totalPages)}"
+                    th:class="${i == currentPageNotResolved} ? 'active' : ''">
+                    <a th:href="@{/appointments(pageForNotResolved=${i}, sizeForNotResolved=${pageSizeNotResolved})}"
+                       th:text="${i}">1</a>
+                </li>
+                <li th:class="${currentPageNotResolved == notResolvedPageMetadata.totalPages} ? 'disabled' : ''">
+                    <a th:href="@{/appointments(pageForNotResolved=${currentPageNotResolved + 1}, sizeForNotResolved=${pageSizeNotResolved})}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div th:replace="footer :: footer">...</div>
+</body>
+</html>
