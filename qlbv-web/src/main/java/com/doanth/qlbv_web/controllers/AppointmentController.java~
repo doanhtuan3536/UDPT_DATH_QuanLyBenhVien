@@ -145,10 +145,6 @@ public class AppointmentController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
         AppointmentInfo appointmentInfo = appointmentServiceClient.notconfirmAppointment(loggedUser.getAccessToken(), id);
-        String accessToken = authServiceClient.serviceLogin(serviceUsername, secretPassword);
-        UserDetailsFromDB userDetailsFromDB = authServiceClient.getuserInfo(appointmentInfo.getUserId(), accessToken);
-        appointmentInfo.setUserEmail(userDetailsFromDB.getEmail());
-        producer.sendAppointmentNotConfirmMessage(appointmentInfo);
         redirectAttributes.addFlashAttribute("successfulMessage", "Hủy xác nhận lịch khám thành công");
         System.out.println(appointmentInfo);
 

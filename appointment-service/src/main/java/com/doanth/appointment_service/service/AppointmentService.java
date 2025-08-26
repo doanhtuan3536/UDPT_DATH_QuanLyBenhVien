@@ -3,12 +3,14 @@ package com.doanth.appointment_service.service;
 import com.doanth.appointment_service.models.Appointment;
 import com.doanth.appointment_service.models.Doctor;
 import com.doanth.appointment_service.repository.AppointmentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -73,18 +75,38 @@ public class AppointmentService {
                 ? Sort.by(actualFieldName).descending() : Sort.by(actualFieldName).ascending();
     }
 
-    public Appointment updateStatusById(int appointmentId, int doctorId) {
+    public Appointment updateStatusById(int appointmentId, int doctorId, String status) {
 
         Appointment appointmentInDB = repo.findById(appointmentId).orElse(null);
 
         if (appointmentInDB == null) {
             throw new AppointmentNotFoundException(appointmentId);
         }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime appointmentDateTime = LocalDateTime.of(appointmentInDB.getAppointmentDate(), appointmentInDB.getAppointmentTime());
+        if(appointmentDateTime.isAfter(now)) {
+            appointmentInDB.setStatus(status);
+        }
+        else{
+            appointmentInDB.setStatus("expired");
+        }
         System.out.println("before");
-        appointmentInDB.setStatus("resolved");
+
         appointmentInDB.setDoctor(new Doctor());
         appointmentInDB.getDoctor().setDoctorId(doctorId);
         System.out.println("updateStatusById updated status for appointment " + appointmentId);
         return repo.save(appointmentInDB);
+    }
+    @Transactional
+    public Appointment delete(Integer appointmentId) {
+        Appointment appointment = repo.findById(appointmentId).orElse(null);
+
+        if (appointment == null) {
+            throw new AppointmentNotFoundException(appointmentId);
+        }
+
+        repo.trashByAppointmentId(appointmentId);
+
+        return appointment;
     }
 }

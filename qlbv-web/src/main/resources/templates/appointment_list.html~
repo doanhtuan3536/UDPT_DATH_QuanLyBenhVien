@@ -99,15 +99,17 @@
                 <i class="fas fa-plus-circle"></i> Đặt lịch khám mới
             </a>
 
-            <button class="btn btn-danger" id="deleteExpiredBtn">
-                <i class="fas fa-trash"></i> Xóa tất cả lịch hết hạn
-            </button>
+<!--            <button class="btn btn-danger" id="deleteExpiredBtn">-->
+<!--                <i class="fas fa-trash"></i> Xóa tất cả lịch hết hạn-->
+<!--            </button>-->
         </div>
 
         <!-- Phần lịch khám đã hoàn thành (resolved) - HIỂN THỊ TRÊN CÙNG -->
         <h2 class="section-title">
             <i class="fas fa-check-circle"></i> Lịch khám đã xác nhận
         </h2>
+
+        <div th:if="${successfulMessage}" class="alert alert-success text-center" th:text="${successfulMessage}"></div>
 
         <div class="page-info" th:if="${resolvedAppointments != null and !resolvedAppointments.empty}">
             Hiển thị <span th:text="${resolvedAppointments.size()}"></span> trên tổng số
@@ -157,7 +159,7 @@
             <!-- Display doctor info for resolved appointments -->
             <div th:each="doctor : ${listDoctorsForResolved}">
                 <div class="doctor-info">
-                    <h4>Thông tin bác sĩ khám (cho lịch #APT<span th:text="${#strings.pad(doctor.appointmentId, 3, '0')}"></span>)</h4>
+                    <h4>Thông tin bác sĩ khám (cho lịch có id: <span th:text="${doctor.appointmentId}"></span>)</h4>
                     <div class="doctor-details">
                         <div class="doctor-detail">
                             <label>Họ tên:</label>
@@ -210,6 +212,7 @@
         <h2 class="section-title">
             <i class="fas fa-clock"></i> Lịch khám chưa xác nhận
         </h2>
+        <div th:if="${successfulDeleteMessage}" class="alert alert-success text-center" th:text="${successfulMessage}"></div>
 
         <div class="page-info" th:if="${notResolvedAppointments != null and !notResolvedAppointments.empty}">
             Hiển thị <span th:text="${notResolvedAppointments.size()}"></span> trên tổng số

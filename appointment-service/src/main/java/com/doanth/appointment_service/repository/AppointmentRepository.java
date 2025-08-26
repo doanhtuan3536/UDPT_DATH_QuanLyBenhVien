@@ -2,6 +2,7 @@ package com.doanth.appointment_service.repository;
 
 import com.doanth.appointment_service.models.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -20,4 +21,20 @@ public interface AppointmentRepository extends FilterableAppointmentRepository,J
 
     @Query("SELECT l FROM Appointment l WHERE l.trashed = false AND l.userId = ?1 AND l.status = 'resolved'")
     public List<Appointment> findByUserIdAndStatusResolved(Integer userId);
+
+    @Modifying
+    @Query("""
+    UPDATE Appointment a 
+    SET a.status = 'expired' 
+    WHERE a.status <> 'resolved'
+          AND (
+               a.appointmentDate < CURRENT_DATE
+               OR (a.appointmentDate = CURRENT_DATE AND a.appointmentTime < CURRENT_TIME)
+          )
+    """)
+    public int updateStatusExpired();
+
+    @Modifying
+    @Query("UPDATE Appointment SET trashed = true WHERE appointmentId = ?1")
+    public void trashByAppointmentId(Integer appointmentId);
 }

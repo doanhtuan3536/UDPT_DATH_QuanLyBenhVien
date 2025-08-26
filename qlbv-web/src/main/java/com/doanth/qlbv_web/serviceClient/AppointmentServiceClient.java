@@ -29,6 +29,9 @@ public class AppointmentServiceClient {
     private final String getSpecialtiesUrl = "http://localhost:8084/api/appointments/specialties";
     private final String AppointmentsUrl = "http://localhost:8084/api/appointments";
     private final String confirmAppointmentUrl = "http://localhost:8084/api/appointments/confirm";
+    private final String notconfirmAppointmentUrl = "http://localhost:8084/api/appointments/notconfirm";
+    private final String deleteAppointmentUrl = "http://localhost:8084/api/appointments/delete";
+
 //    private final String listAppointmentsForDoctorUrl = "http://localhost:8084/api/appointments/";
 
     public List<Specialty> getSpecialties(String accessToken) throws RefreshTokenException, JwtValidationException {
@@ -207,8 +210,20 @@ public class AppointmentServiceClient {
                     JsonNode appointmentsNode = embeddedNode.get("appointments");
                     AppointmentInfo[] appointments = objectMapper.treeToValue(appointmentsNode, AppointmentInfo[].class);
                     result.setListAppointments(Arrays.asList(appointments));
+                    if (result.getListAppointments() != null && result.getListAppointments().size() > 0 && status.equals("resolved")) {
+                        {
+                            result.setListDoctors(new ArrayList<>());
+                            result.getListAppointments().forEach(appointment -> {
+                                result.getListDoctors().add(appointment.getDoctorInfoDTO());
+                            });
+                            System.out.println(result.getListDoctors());
+                        }
+                    }
+                    else {
+                        result.setListDoctors(new ArrayList<>());
+                    }
                 }
-
+                System.out.println(result);
                 // Extract page metadata
                 JsonNode pageNode = rootNode.get("page");
                 if (pageNode != null) {
@@ -216,7 +231,7 @@ public class AppointmentServiceClient {
                     result.setPageMetadata(pageMetadata);
                 }
 
-                result.setListDoctors(new ArrayList<>());
+//                result.setListDoctors(new ArrayList<>());
 
                 return result;
 
@@ -259,6 +274,7 @@ public class AppointmentServiceClient {
             // Empty list for doctors
             System.out.println(response);
 
+
             return response.getBody();
         } catch (HttpClientErrorException e) {
             ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
@@ -270,6 +286,101 @@ public class AppointmentServiceClient {
                 response = restTemplate.exchange(
                         newAppointmentsUrl,
                         HttpMethod.PUT,
+                        newRequest,
+                        AppointmentInfo.class
+                );
+                return response.getBody();
+
+            }
+
+            error.getErrors().forEach((errorMsg)-> {
+                if (errorMsg.contains("No appointment found with the given id")){
+                    throw new AppointmentNotFoundException(appointmentId);
+                }
+            });
+//
+            throw new JwtValidationException(e.getResponseBodyAsString());
+        }
+    }
+
+    public AppointmentInfo notconfirmAppointment(String accessToken, int appointmentId) throws RefreshTokenException, JwtValidationException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<AppointmentInfo> response = null;
+
+        String newAppointmentsUrl = notconfirmAppointmentUrl + "/" + appointmentId;
+
+        try {
+            response = restTemplate.exchange(
+                    newAppointmentsUrl,
+                    HttpMethod.PUT,
+                    request,
+                    AppointmentInfo.class
+            );
+
+            // Empty list for doctors
+            System.out.println(response);
+
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+            if(error.getErrors().contains("Access token expired")){
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<AppointmentInfo> newRequest = new HttpEntity<>(newHeaders);
+                response = restTemplate.exchange(
+                        newAppointmentsUrl,
+                        HttpMethod.PUT,
+                        newRequest,
+                        AppointmentInfo.class
+                );
+                return response.getBody();
+
+            }
+
+            error.getErrors().forEach((errorMsg)-> {
+                if (errorMsg.contains("No appointment found with the given id")){
+                    throw new AppointmentNotFoundException(appointmentId);
+                }
+            });
+//
+            throw new JwtValidationException(e.getResponseBodyAsString());
+        }
+    }
+    public AppointmentInfo deleteAppointment(String accessToken, int appointmentId) throws RefreshTokenException, JwtValidationException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<AppointmentInfo> response = null;
+
+        String newAppointmentsUrl = deleteAppointmentUrl + "/" + appointmentId;
+
+        try {
+            response = restTemplate.exchange(
+                    newAppointmentsUrl,
+                    HttpMethod.DELETE,
+                    request,
+                    AppointmentInfo.class
+            );
+
+            // Empty list for doctors
+            System.out.println(response);
+
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+            if(error.getErrors().contains("Access token expired")){
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
+                response = restTemplate.exchange(
+                        newAppointmentsUrl,
+                        HttpMethod.DELETE,
                         newRequest,
                         AppointmentInfo.class
                 );

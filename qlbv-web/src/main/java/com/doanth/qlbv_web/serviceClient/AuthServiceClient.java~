@@ -144,18 +144,18 @@ public class AuthServiceClient {
             throw new AccessTokenForServiceException("authentication for access token failed or the auth service server is down");
         }
     }
-    public UserDetailsFromDB getuserInfo(Integer userId, String accessToken) throws JwtValidationException {
+    public UserDetailsFromDB getuserInfo(Integer doctorId, String accessToken) throws JwtValidationException {
 //        Claims claims = validateAccessToken(AccessTokenJwt);
 //        return (DoctorInfoDTO) claims.get("doctorInfoDTO");
 //        String accessToken = login(serviceUsername, secretPassword);
-        String url = userInfoUrl + "/" + userId;
+        String url = userInfoUrl + "/" + doctorId;
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<UserDetailsFromDB> response = null;
+        ResponseEntity<DoctorInfoDTO> response = null;
         try{
             response= restTemplate.exchange(
-                    url, HttpMethod.GET, request, UserDetailsFromDB.class
+                    url, HttpMethod.GET, request, DoctorInfoDTO.class
             );
             return response.getBody();
         }
@@ -163,7 +163,7 @@ public class AuthServiceClient {
             ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
             error.getErrors().forEach((errorMsg)-> {
                 if (errorMsg.contains("No user found with given id")){
-                    throw new UserNotFoundException((long)userId);
+                    throw new UserNotFoundException((long)doctorId);
                 }
             });
             throw new JwtValidationException(e.getResponseBodyAs(String.class));

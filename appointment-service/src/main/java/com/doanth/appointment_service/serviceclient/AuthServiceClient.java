@@ -103,4 +103,6 @@ public class AuthServiceClient {
             throw new JwtValidationException(e.getResponseBodyAs(String.class));
         }
     }
+
+
 }

@@ -1,12 +1,12 @@
-package com.doanth.qlbv_web.dto;
+package com.doanlt.notification_service.rabbitmq;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-@Relation(collectionRelation = "appointments")
+
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AppointmentInfo {
     @JsonProperty("appointmentId")
@@ -38,6 +38,16 @@ public class AppointmentInfo {
 
     @JsonProperty("doctorInfoDTO")
     private DoctorDTO doctorInfoDTO;
+
+    private String userEmail;
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
 
     public DoctorDTO getDoctorInfoDTO() {
         return doctorInfoDTO;
@@ -148,6 +158,7 @@ public class AppointmentInfo {
                 ", specialtyName='" + specialtyName + '\'' +
                 ", specialtyRoom='" + specialtyRoom + '\'' +
                 ", doctorInfoDTO=" + doctorInfoDTO +
+                ", userEmail='" + userEmail + '\'' +
                 '}';
     }
 }

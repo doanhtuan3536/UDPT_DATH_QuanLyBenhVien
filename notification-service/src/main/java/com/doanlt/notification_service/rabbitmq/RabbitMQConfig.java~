@@ -14,7 +14,6 @@ public class RabbitMQConfig {
     public static final String NOTIFICATION_EXCHANGE = "notification.exchange";
     public static final String NOTIFICATION_USER_CREATED_QUEUE = "notification.user.created.queue";
     public static final String NOTIFICATION_APPOINTMENT_CONFIRM_QUEUE = "notification.appointment.confirm.queue";
-    public static final String NOTIFICATION_APPOINTMENT_NOTCONFIRM_QUEUE = "notification.appointment.notconfirm.queue";
 //    public static final String NOTIFICATION_ADD_MEMBER_RESULT_QUEUE = "notification.add.member.result.queue";
 //    @Bean
 //    public Queue queue() {

@@ -1,5 +1,6 @@
 package com.doanth.qlbv_web;
 
+import com.doanth.qlbv_web.serviceClient.AccessTokenForServiceException;
 import com.doanth.qlbv_web.serviceClient.AppointmentNotFoundException;
 import com.doanth.qlbv_web.serviceClient.JwtValidationException;
 import com.doanth.qlbv_web.serviceClient.RefreshTokenException;
@@ -38,7 +39,7 @@ public class GlobalExceptionHandler {
 //        SecurityContextHolder.clearContext();
         return "error";
     }
-    @ExceptionHandler({JwtValidationException.class, JsonProcessingException.class, })
+    @ExceptionHandler({JwtValidationException.class, JsonProcessingException.class, AccessTokenForServiceException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleConstraintViolation(HttpServletRequest request, Exception ex, Model model) {
 //        ErrorDTO error = new ErrorDTO();
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
         if (session != null) {
             session.invalidate();
         }
-        model.addAttribute("errorMessage", "Lỗi hệ thống không tìm thấy lịch khám, vui lòng quay về trang home");
+        model.addAttribute("errorMessage", "Lỗi hệ thống không tìm thấy lịch khám, vui lòng quay về trang home hoặc đăng nhập lại");
 //        SecurityContextHolder.clearContext();
         return "error";
     }

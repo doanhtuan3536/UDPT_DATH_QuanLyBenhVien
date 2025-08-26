@@ -69,7 +69,7 @@ public class AppointmentController {
                                               @RequestParam(value = "size", required = false, defaultValue = "5")
                                                   @Min(value = 5) @Max(value = 20) Integer pageSize,
 
-                                              @RequestParam(value = "sort", required = false, defaultValue = "appointmentDate,appointmentTime,appointmentId") String sortOption,
+                                              @RequestParam(value = "sort", required = false, defaultValue = "-appointmentDate,-appointmentTime,appointmentId") String sortOption,
                                               @RequestParam(value = "status", required = false, defaultValue = "resolved") String status) throws BadRequestException, JwtValidationException {
 //        List<Specialty> specialties = specialtyService.list();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -188,9 +188,27 @@ public class AppointmentController {
     public ResponseEntity<?> confirmAppointment(@PathVariable("id") Integer appointmentId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
-        Appointment updatedAppointment = appointmentService.updateStatusById(appointmentId, user.getUserId());
+        Appointment updatedAppointment = appointmentService.updateStatusById(appointmentId, user.getUserId(), "resolved");
 
         return ResponseEntity.ok(entity2DTO(updatedAppointment));
+    }
+
+    @PutMapping("/notconfirm/{id}")
+    public ResponseEntity<?> notconfirmAppointment(@PathVariable("id") Integer appointmentId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Appointment updatedAppointment = appointmentService.updateStatusById(appointmentId, user.getUserId(), "pending");
+
+        return ResponseEntity.ok(entity2DTO(updatedAppointment));
+    }
+
+    @DeleteMapping ("/delete/{id}")
+    public ResponseEntity<?> deleteAppointment(@PathVariable("id") Integer appointmentId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Appointment deletedAppointment = appointmentService.delete(appointmentId);
+
+        return ResponseEntity.ok(entity2DTO(deletedAppointment));
     }
 
     private String convertDayOfWeekToVietnamese(DayOfWeek day) {

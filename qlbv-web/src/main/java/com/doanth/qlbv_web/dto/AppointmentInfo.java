@@ -39,6 +39,16 @@ public class AppointmentInfo {
     @JsonProperty("doctorInfoDTO")
     private DoctorDTO doctorInfoDTO;
 
+    private String userEmail;
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
     public DoctorDTO getDoctorInfoDTO() {
         return doctorInfoDTO;
     }
@@ -148,6 +158,7 @@ public class AppointmentInfo {
                 ", specialtyName='" + specialtyName + '\'' +
                 ", specialtyRoom='" + specialtyRoom + '\'' +
                 ", doctorInfoDTO=" + doctorInfoDTO +
+                ", userEmail='" + userEmail + '\'' +
                 '}';
     }
 }

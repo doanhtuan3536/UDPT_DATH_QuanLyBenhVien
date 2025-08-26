@@ -3,7 +3,6 @@ package com.doanth.appointment_service.serviceclient;
 import com.doanth.appointment_service.dto.DoctorInfoDTO;
 import com.doanth.appointment_service.security.ErrorDTO;
 import com.doanth.appointment_service.security.JwtValidationException;
-import com.doanth.appointment_service.service.AppointmentNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.beans.factory.annotation.Value;

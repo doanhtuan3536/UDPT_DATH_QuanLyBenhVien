@@ -1,8 +1,6 @@
 package com.doanth.qlbv_web;
 
-import com.doanth.qlbv_web.serviceClient.AppointmentNotFoundException;
-import com.doanth.qlbv_web.serviceClient.JwtValidationException;
-import com.doanth.qlbv_web.serviceClient.RefreshTokenException;
+import com.doanth.qlbv_web.serviceClient.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -38,7 +36,7 @@ public class GlobalExceptionHandler {
 //        SecurityContextHolder.clearContext();
         return "error";
     }
-    @ExceptionHandler({JwtValidationException.class, JsonProcessingException.class, })
+    @ExceptionHandler({JwtValidationException.class, JsonProcessingException.class, AccessTokenForServiceException.class, UserNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleConstraintViolation(HttpServletRequest request, Exception ex, Model model) {
 //        ErrorDTO error = new ErrorDTO();

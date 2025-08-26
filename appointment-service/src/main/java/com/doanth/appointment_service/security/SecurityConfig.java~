@@ -28,7 +28,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.PUT,"/api/appointments/notconfirm/*")
                                 .hasAnyAuthority("nhanvien", "bacsi")
                                 .requestMatchers(HttpMethod.DELETE,"/api/appointments/delete/*")
-                                .hasAnyAuthority("nhanvien", "bacsi", "benhnhan")
+                                .hasAnyAuthority("nhanvien", "bacsi")
                                 .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
