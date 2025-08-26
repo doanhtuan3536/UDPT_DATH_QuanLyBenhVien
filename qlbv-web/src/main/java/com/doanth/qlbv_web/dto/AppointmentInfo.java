@@ -36,10 +36,21 @@ public class AppointmentInfo {
     @JsonProperty("specialtyRoom")
     private String specialtyRoom;
 
+    @JsonProperty("doctorInfoDTO")
+    private DoctorDTO doctorInfoDTO;
+
+    public DoctorDTO getDoctorInfoDTO() {
+        return doctorInfoDTO;
+    }
+
+    public void setDoctorInfoDTO(DoctorDTO doctorInfoDTO) {
+        this.doctorInfoDTO = doctorInfoDTO;
+    }
+
     public AppointmentInfo() {}
 
-    public AppointmentInfo(Integer appointmentId, LocalDate appointmentDate, LocalTime appointmentTime,
-                           String note, Integer specialtyId, Integer userId, String status, String specialtyName, String specialtyRoom) {
+    public AppointmentInfo(Integer appointmentId, LocalDate appointmentDate, LocalTime appointmentTime, String note, Integer specialtyId,
+                           Integer userId, String status, String specialtyName, String specialtyRoom, DoctorDTO doctorInfoDTO) {
         this.appointmentId = appointmentId;
         this.appointmentDate = appointmentDate;
         this.appointmentTime = appointmentTime;
@@ -49,6 +60,7 @@ public class AppointmentInfo {
         this.status = status;
         this.specialtyName = specialtyName;
         this.specialtyRoom = specialtyRoom;
+        this.doctorInfoDTO = doctorInfoDTO;
     }
 
     public String getSpecialtyName() {
@@ -135,6 +147,7 @@ public class AppointmentInfo {
                 ", status='" + status + '\'' +
                 ", specialtyName='" + specialtyName + '\'' +
                 ", specialtyRoom='" + specialtyRoom + '\'' +
+                ", doctorInfoDTO=" + doctorInfoDTO +
                 '}';
     }
 }

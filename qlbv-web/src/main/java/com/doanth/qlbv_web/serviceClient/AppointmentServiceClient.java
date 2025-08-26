@@ -153,8 +153,20 @@ public class AppointmentServiceClient {
                 JsonNode appointmentsNode = embeddedNode.get("appointments");
                 AppointmentInfo[] appointments = objectMapper.treeToValue(appointmentsNode, AppointmentInfo[].class);
                 result.setListAppointments(Arrays.asList(appointments));
+                if (result.getListAppointments() != null && result.getListAppointments().size() > 0 && status.equals("resolved")) {
+                    {
+                        result.setListDoctors(new ArrayList<>());
+                        result.getListAppointments().forEach(appointment -> {
+                            result.getListDoctors().add(appointment.getDoctorInfoDTO());
+                        });
+                        System.out.println(result.getListDoctors());
+                    }
+                }
+                else {
+                    result.setListDoctors(new ArrayList<>());
+                }
             }
-
+            System.out.println(result);
             // Extract page metadata
             JsonNode pageNode = rootNode.get("page");
             if (pageNode != null) {
@@ -162,7 +174,7 @@ public class AppointmentServiceClient {
                 result.setPageMetadata(pageMetadata);
             }
 
-            result.setListDoctors(new ArrayList<>()); // Empty list for doctors
+             // Empty list for doctors
 
             return result;
 //            return appointments.getContent().stream().toList();
@@ -264,9 +276,12 @@ public class AppointmentServiceClient {
                 return response.getBody();
 
             }
-            if (error.getErrors().contains("No appointment found with the given id")) {
-                throw new AppointmentNotFoundException(appointmentId);
-            }
+
+            error.getErrors().forEach((errorMsg)-> {
+                if (errorMsg.contains("No appointment found with the given id")){
+                    throw new AppointmentNotFoundException(appointmentId);
+                }
+            });
 //
             throw new JwtValidationException(e.getResponseBodyAsString());
         }

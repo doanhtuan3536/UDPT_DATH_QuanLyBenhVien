@@ -55,7 +55,7 @@ public class JwtUtility {
                 .issuer(issuerName)
                 .issuedAt(new Date())
                 .expiration(new Date(expirationTimeInMillis))
-                .claim("role", service.getServiceRole())
+                .claim("role", service.getLoai())
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), Jwts.SIG.HS512)
                 .compact();
 

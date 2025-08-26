@@ -33,7 +33,7 @@ public class Appointment {
     @JoinColumn(name = "chuyenkhoa_id")
     private Specialty specialty;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bacsi_id")
     private Doctor doctor;
 

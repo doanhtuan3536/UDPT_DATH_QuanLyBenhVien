@@ -36,6 +36,24 @@ public class AppointmentInfo {
     @JsonProperty("specialtyRoom")
     private String specialtyRoom;
 
+    @JsonProperty("doctorInfoDTO")
+    private DoctorDTO doctorInfoDTO;
+
+    public AppointmentInfo() {}
+
+    public AppointmentInfo(Integer appointmentId, LocalDate appointmentDate, LocalTime appointmentTime,
+                           String note, Integer specialtyId, Integer userId, String status, String specialtyName, String specialtyRoom) {
+        this.appointmentId = appointmentId;
+        this.appointmentDate = appointmentDate;
+        this.appointmentTime = appointmentTime;
+        this.note = note;
+        this.specialtyId = specialtyId;
+        this.userId = userId;
+        this.status = status;
+        this.specialtyName = specialtyName;
+        this.specialtyRoom = specialtyRoom;
+    }
+
     public String getSpecialtyName() {
         return specialtyName;
     }

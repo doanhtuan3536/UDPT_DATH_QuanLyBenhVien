@@ -48,6 +48,28 @@ public class TokenService {
 
         return response;
     }
+    public String generateTokenForService(com.doanth.auth_service.model.Service service) {
+        String accessToken = jwtUtil.generateAccessTokenForService(service);
+
+//        AuthResponse response = new AuthResponse();
+//        response.setAccessToken(accessToken);
+//        response.setUserId(user.getUserId());
+
+//        String randomUUID = UUID.randomUUID().toString();
+
+//        response.setRefreshToken(randomUUID);
+
+//        RefreshToken refreshToken = new RefreshToken();
+//        refreshToken.setUser(user);
+//        refreshToken.setToken(passwordEncoder.encode(randomUUID));
+
+//        long refreshTokenExpirationInMillis = System.currentTimeMillis() + refreshTokenExpiration * 60000;
+//        refreshToken.setExpiryTime(new Date(refreshTokenExpirationInMillis));
+
+//        refreshTokenRepo.save(refreshToken);
+
+        return accessToken;
+    }
 
     public AuthResponse refreshTokens(RefreshTokenRequest request) throws RefreshTokenNotFoundException, RefreshTokenExpiredException {
         String rawRefreshToken = request.getRefreshToken();

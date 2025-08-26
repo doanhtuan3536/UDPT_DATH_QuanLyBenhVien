@@ -154,54 +154,31 @@
             </tbody>
         </table>
         <div class="doctor-info-container" sec:authorize="isAuthenticated() and (#authentication.principal.authResponse.role == 'benhnhan')">
-            <div class="doctor-info">
-                <h4>Thông tin bác sĩ khám (cho lịch #APT001)</h4>
-                <div class="doctor-details">
-                    <div class="doctor-detail">
-                        <label>Họ tên:</label>
-                        <span>BS. Trần Văn B</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>Ngày sinh:</label>
-                        <span>15/05/1980</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>SĐT:</label>
-                        <span>0909123456</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>Giới tính:</label>
-                        <span>Nam</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>Email:</label>
-                        <span>tranvanb@hospital.com</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="doctor-info">
-                <h4>Thông tin bác sĩ khám (cho lịch #APT005)</h4>
-                <div class="doctor-details">
-                    <div class="doctor-detail">
-                        <label>Họ tên:</label>
-                        <span>BS. Lê Thị C</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>Ngày sinh:</label>
-                        <span>20/11/1985</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>SĐT:</label>
-                        <span>0909876543</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>Giới tính:</label>
-                        <span>Nữ</span>
-                    </div>
-                    <div class="doctor-detail">
-                        <label>Email:</label>
-                        <span>lethic@hospital.com</span>
+            <!-- Display doctor info for resolved appointments -->
+            <div th:each="doctor : ${listDoctorsForResolved}">
+                <div class="doctor-info">
+                    <h4>Thông tin bác sĩ khám (cho lịch có id: <span th:text="${doctor.appointmentId}"></span>)</h4>
+                    <div class="doctor-details">
+                        <div class="doctor-detail">
+                            <label>Họ tên:</label>
+                            <span th:text="'BS. ' + ${doctor.hoten}">BS. do anh tu</span>
+                        </div>
+                        <div class="doctor-detail">
+                            <label>Ngày sinh:</label>
+                            <span th:text="${#temporals.format(doctor.ngaysinh, 'dd/MM/yyyy')}">01/01/1995</span>
+                        </div>
+                        <div class="doctor-detail">
+                            <label>SĐT:</label>
+                            <span th:text="${doctor.sdt}">0900000000</span>
+                        </div>
+                        <div class="doctor-detail">
+                            <label>Giới tính:</label>
+                            <span th:text="${doctor.gioitinh}">Nam</span>
+                        </div>
+                        <div class="doctor-detail">
+                            <label>Email:</label>
+                            <span th:text="${doctor.email}">doanhtu7123@gmail.com</span>
+                        </div>
                     </div>
                 </div>
             </div>

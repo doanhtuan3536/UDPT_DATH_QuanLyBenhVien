@@ -1,5 +1,6 @@
 package com.doanth.auth_service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -13,12 +14,14 @@ public class User {
     private Integer userId;
 
     @Column(name = "username", nullable = false, length = 50)
+    @JsonIgnore
     private String username;
 
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
     @Column(name = "password", nullable = false, length = 255)
+    @JsonIgnore
     private String password;
 
     @Column(name = "hoten", nullable = false, length = 255)
@@ -34,9 +37,11 @@ public class User {
     private String sdt;
 
     @Column(name = "loai", nullable = false, length = 11)
+    @JsonIgnore
     private String loai;
 
     @Column(name = "status", nullable = false, length = 11)
+    @JsonIgnore
     private String status;
 
     public String getStatus() {

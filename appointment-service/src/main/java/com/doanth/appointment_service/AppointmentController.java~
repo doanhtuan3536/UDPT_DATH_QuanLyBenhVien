@@ -4,13 +4,16 @@ import com.doanth.appointment_service.dto.AppointmentInfoDTO;
 import com.doanth.appointment_service.dto.SpecialtyInforForListAppointments;
 import com.doanth.appointment_service.models.Appointment;
 import com.doanth.appointment_service.models.Specialty;
+import com.doanth.appointment_service.security.JwtValidationException;
 import com.doanth.appointment_service.security.User;
 import com.doanth.appointment_service.service.*;
+import com.doanth.appointment_service.serviceclient.AuthServiceClient;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.apache.coyote.BadRequestException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +41,14 @@ public class AppointmentController {
     private DoctorService doctorService;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private AuthServiceClient authServiceClient;
+
+    @Value("${service.auth.username}")
+    private String serviceUsername;
+
+    @Value("${service.auth.password}")
+    private String secretPassword;
 
     @GetMapping("/specialties")
     public ResponseEntity<?> listSpecialties() {
@@ -59,7 +70,7 @@ public class AppointmentController {
                                                   @Min(value = 5) @Max(value = 20) Integer pageSize,
 
                                               @RequestParam(value = "sort", required = false, defaultValue = "appointmentDate,appointmentTime,appointmentId") String sortOption,
-                                              @RequestParam(value = "status", required = false, defaultValue = "resolved") String status) throws BadRequestException {
+                                              @RequestParam(value = "status", required = false, defaultValue = "resolved") String status) throws BadRequestException, JwtValidationException {
 //        List<Specialty> specialties = specialtyService.list();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -94,17 +105,45 @@ public class AppointmentController {
             return ResponseEntity.ok(respondBody);
         }
         else if(role .equals("benhnhan")) {
-//            List<Appointment> appointments = appointmentService.listBySpecialtyIdAndStatusNotResolved(user.getUserId());
-//            List<Appointment> resolvedAppointments = appointmentService.listBySpecialtyIdAndStatusResolved(user.getUserId());
-////            System.out.println(appointments);
-//
-//            List<AppointmentInfoDTO> listAppointmentsNotResolved = listEntity2ListDTO(appointments);
-//            List<AppointmentInfoDTO> listAppointmentsResolved = listEntity2ListDTO(resolvedAppointments);
-//            List<DoctorInfoDTO> specialties = new ArrayList<>(); // <1>
-//            resolvedAppointments.forEach(a -> {
-//                DoctorInfoDTO doctorInfo = new DoctorInfoDTO();
-//                doctorInfo.setHoten(a.getDoctor().get());
-//            });
+
+            Map<String, Object> filterFields = new java.util.HashMap<>();
+            filterFields.put("userId", user.getUserId());
+            Page<Appointment> appointments = null;
+            if(status.startsWith("-")) {
+                filterFields.put("ne_status", status.substring(1));
+
+                appointments = appointmentService.listByPage(page-1, pageSize, sortOption, filterFields);
+            }
+            else {
+                filterFields.put("status", status);
+//                filterFields.put("doctor.doctorId", user.getUserId());
+                appointments = appointmentService.listByPage(page - 1, pageSize, sortOption, filterFields);
+            }
+            List<Appointment> listAppointments = appointments.getContent();
+            List<AppointmentInfoDTO> listAppointmentsDTO = listEntity2ListDTO(listAppointments);
+            String accessToken = authServiceClient.login(serviceUsername, secretPassword);
+            for (int i = 0; i < listAppointmentsDTO.size(); i++) {
+                listAppointmentsDTO.get(i).setSpecialtyName(listAppointments.get(i).getSpecialty().getName());
+                listAppointmentsDTO.get(i).setSpecialtyRoom(listAppointments.get(i).getSpecialty().getRoom());
+                if(status.equals("resolved")){
+                    listAppointmentsDTO.get(i).setDoctorInfoDTO(authServiceClient.getDoctorInfo(listAppointments.get(i).getDoctor().getDoctorId(), accessToken));
+                }
+            }
+//            if(status.equals("resolved")){
+//                listAppointmentsDTO.forEach(a -> {
+//                    try {
+//                        a.setDoctorInfoDTO(authServiceClient.getDoctorInfo(a.getUserId(), accessToken));
+//                    } catch (JwtValidationException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                });
+//            }
+            var respondBody = addPageMetadataAndLinks2Collection(listAppointmentsDTO, appointments, sortOption, status);
+            System.out.println(respondBody);
+            return ResponseEntity.ok(respondBody);
+
+//            DoctorInfoDTO doctorInfoDTO = authServiceClient.getDoctorInfo(user.getUserId(), accessToken);
+
         }
         return ResponseEntity.status(403).build();
     }
@@ -146,9 +185,9 @@ public class AppointmentController {
 
     @PutMapping("/confirm/{id}")
     public ResponseEntity<?> confirmAppointment(@PathVariable("id") Integer appointmentId) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
-        Appointment updatedAppointment = appointmentService.updateStatusById(appointmentId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        Appointment updatedAppointment = appointmentService.updateStatusById(appointmentId, user.getUserId());
 
         return ResponseEntity.ok(entity2DTO(updatedAppointment));
     }

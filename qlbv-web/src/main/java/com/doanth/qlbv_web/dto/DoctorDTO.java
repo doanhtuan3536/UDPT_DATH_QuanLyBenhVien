@@ -1,8 +1,13 @@
 package com.doanth.qlbv_web.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 
 public class DoctorDTO {
+    @JsonProperty("userId")
+    private Integer doctorId;
+
     private String email;
 
     private String hoten;
@@ -21,6 +26,22 @@ public class DoctorDTO {
     public void setAppointmentId(Integer appointmentId) {
         this.appointmentId = appointmentId;
     }
+
+    public Integer getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Integer doctorId) {
+        this.doctorId = doctorId;
+    }
+
+//    public Integer getAppointmentId() {
+//        return appointmentId;
+//    }
+//
+//    public void setAppointmentId(Integer appointmentId) {
+//        this.appointmentId = appointmentId;
+//    }
 
     public String getEmail() {
         return email;
@@ -64,8 +85,9 @@ public class DoctorDTO {
 
     @Override
     public String toString() {
-        return "DoctorInfoDTO{" +
-                "email='" + email + '\'' +
+        return "DoctorDTO{" +
+                "doctorId=" + doctorId +
+                ", email='" + email + '\'' +
                 ", hoten='" + hoten + '\'' +
                 ", ngaysinh=" + ngaysinh +
                 ", gioitinh='" + gioitinh + '\'' +

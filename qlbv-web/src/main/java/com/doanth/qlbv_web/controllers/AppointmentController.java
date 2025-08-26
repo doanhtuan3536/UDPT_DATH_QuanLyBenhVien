@@ -64,6 +64,7 @@ public class AppointmentController {
         model.addAttribute("pageSizeResolved", pageSizeForResolved);
         model.addAttribute("pageSizeNotResolved", pageSizeForNotResolved);
         model.addAttribute("dateUtils", dateUtils);
+        model.addAttribute("listDoctorsForResolved", listAppointmentInfoResolved.getListDoctors());
 
         return "appointment_list";
     }

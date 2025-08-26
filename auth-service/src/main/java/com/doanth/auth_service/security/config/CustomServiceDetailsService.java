@@ -1,0 +1,26 @@
+package com.doanth.auth_service.security.config;
+
+import com.doanth.auth_service.model.Service;
+import com.doanth.auth_service.repository.ServiceRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.List;
+
+public class CustomServiceDetailsService implements UserDetailsService {
+    @Autowired
+    private ServiceRepo serviceRepo;
+
+
+    @Override
+    public UserDetails loadUserByUsername(String serviceName) throws UsernameNotFoundException {
+        Service service = serviceRepo.findByServiceName(serviceName)
+                .orElseThrow(() -> new UsernameNotFoundException("service not found"));
+//        System.out.println(user.getUserType());
+
+        return new CustomServiceDetails(service, List.of(new SimpleGrantedAuthority(service.getServiceRole().toLowerCase())));
+    }
+}

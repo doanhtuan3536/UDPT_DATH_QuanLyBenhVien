@@ -15,6 +15,15 @@ public class AppointmentInfoDTO{
     private String status;
     private String specialtyName;
     private String specialtyRoom;
+    private DoctorInfoDTO doctorInfoDTO;
+
+    public DoctorInfoDTO getDoctorInfoDTO() {
+        return doctorInfoDTO;
+    }
+
+    public void setDoctorInfoDTO(DoctorInfoDTO doctorInfoDTO) {
+        this.doctorInfoDTO = doctorInfoDTO;
+    }
 
     public String getSpecialtyName() {
         return specialtyName;
@@ -90,7 +99,7 @@ public class AppointmentInfoDTO{
 
     @Override
     public String toString() {
-        return "AppointmentInfo{" +
+        return "AppointmentInfoDTO{" +
                 "appointmentId=" + appointmentId +
                 ", appointmentDate=" + appointmentDate +
                 ", appointmentTime=" + appointmentTime +
@@ -100,6 +109,7 @@ public class AppointmentInfoDTO{
                 ", status='" + status + '\'' +
                 ", specialtyName='" + specialtyName + '\'' +
                 ", specialtyRoom='" + specialtyRoom + '\'' +
+                ", doctorInfoDTO=" + doctorInfoDTO +
                 '}';
     }
 }

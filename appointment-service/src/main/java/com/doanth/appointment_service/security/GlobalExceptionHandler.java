@@ -4,6 +4,8 @@ import com.doanth.appointment_service.service.AppointmentNotFoundException;
 import com.doanth.appointment_service.service.AppointmentTimeNotBetweenWorkingHoursException;
 import com.doanth.appointment_service.service.SpecialtyNotFoundException;
 import com.doanth.appointment_service.service.SpecialtyWorkDaysException;
+import com.doanth.appointment_service.serviceclient.AccessTokenForServiceException;
+import com.doanth.appointment_service.serviceclient.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -49,6 +51,19 @@ public class GlobalExceptionHandler {
 
         error.setTimestamp(new Date());
         error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.addError(ex.getMessage());
+        error.setPath(request.getServletPath());
+        return error;
+    }
+
+    @ExceptionHandler({AccessTokenForServiceException.class, UserNotFoundException.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ErrorDTO handleAccessTokenForServiceException(HttpServletRequest request, Exception ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        error.setTimestamp(new Date());
+        error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         error.addError(ex.getMessage());
         error.setPath(request.getServletPath());
         return error;

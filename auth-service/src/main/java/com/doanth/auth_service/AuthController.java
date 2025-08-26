@@ -6,6 +6,7 @@ import com.doanth.auth_service.dto.SignupResult;
 import com.doanth.auth_service.model.User;
 import com.doanth.auth_service.security.auth.AuthResponse;
 import com.doanth.auth_service.security.auth.TokenService;
+import com.doanth.auth_service.security.config.CustomServiceDetails;
 import com.doanth.auth_service.security.config.CustomUserDetails;
 import com.doanth.auth_service.security.jwt.JwtUtility;
 import com.doanth.auth_service.security.jwt.JwtValidationException;
@@ -15,6 +16,8 @@ import com.doanth.auth_service.security.refreshtoken.RefreshTokenRequest;
 import com.doanth.auth_service.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,23 +31,31 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
-    private final AuthenticationManager authenticationManager;
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
+    @Autowired
+    private  UserService userService;
+    @Autowired
+    @Qualifier("userAuthManager")
+    private  AuthenticationManager userAuthManager;
+    @Autowired
+    @Qualifier("serviceAuthManager")
+    private AuthenticationManager serviceAuthManager;
 //    private final JwtUtility jwtUtil;
-    private final TokenService tokenService;
+    @Autowired
+    private  TokenService tokenService;
+    @Autowired
+    private  JwtUtility jwtUtil;
 
-    private final JwtUtility jwtUtil;
-
-    public AuthController(PasswordEncoder passwordEncoder, UserService userService,
-                          AuthenticationManager authenticationManager, TokenService tokenService, JwtUtility jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
+//    public AuthController(PasswordEncoder passwordEncoder, UserService userService,
+//                          AuthenticationManager authenticationManager, TokenService tokenService, JwtUtility jwtUtil) {
+//        this.authenticationManager = authenticationManager;
+//        this.passwordEncoder = passwordEncoder;
+//        this.userService = userService;
+////        this.jwtUtil = jwtUtil;
+//        this.tokenService = tokenService;
 //        this.jwtUtil = jwtUtil;
-        this.tokenService = tokenService;
-        this.jwtUtil = jwtUtil;
-    }
+//    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupForm body) {
@@ -100,13 +111,34 @@ public class AuthController {
             String username = body.getUsername();
             String password = body.getPassword();
 
-            Authentication authentication = authenticationManager.authenticate(
+            Authentication authentication = userAuthManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
             AuthResponse token = tokenService.generateTokens(customUserDetails.getUser());
             token.setRole(customUserDetails.getAuthorities().iterator().next().getAuthority());
             token.setHoten(customUserDetails.getUser().getHoten());
+            System.out.println(token);
+            return ResponseEntity.ok(token);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/service/login")
+    public ResponseEntity<?> serviceLogin(@RequestBody LoginForm body) {
+        try {
+            String username = body.getUsername();
+            String password = body.getPassword();
+
+            Authentication authentication = serviceAuthManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password));
+            CustomServiceDetails customUserDetails = (CustomServiceDetails) authentication.getPrincipal();
+
+            String token = tokenService.generateTokenForService(customUserDetails.getService());
+//            token.setRole(customUserDetails.getAuthorities().iterator().next().getAuthority());
+//            token.setHoten(customUserDetails.getUser().getHoten());
+            System.out.println("serviceLogin");
             System.out.println(token);
             return ResponseEntity.ok(token);
         } catch (BadCredentialsException e) {
@@ -148,7 +180,7 @@ public class AuthController {
             String username = body.getUsername();
             String password = body.getPassword();
 
-            Authentication authentication = authenticationManager.authenticate(
+            Authentication authentication = userAuthManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
