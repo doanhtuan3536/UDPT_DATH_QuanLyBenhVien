@@ -1,0 +1,41 @@
+package com.doanth.medical_service.models;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+@Entity
+@Table(name = "LICHSUKHAM")
+public class Examination {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "lichsukham_id")
+    private int examinationId;
+
+    @ManyToOne
+    @JoinColumn(name = "hosobenhan_id")
+    private MedicalRecord medicalRecord;
+
+    @Column(name = "bacsi_id", nullable = false)
+    private int doctorId;
+
+    @Column(name = "ngaykham", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "giokham", nullable = false)
+    private LocalTime time;
+
+    @Column(name = "trieuchungchuquan")
+    @Lob
+    private String subjective_note;
+
+    @Column(name = "trieuchungkhachquan")
+    @Lob
+    private String objective_note;
+
+    @Column(name = "chandoan")
+    @Lob
+    private String assessment_note;
+
+}

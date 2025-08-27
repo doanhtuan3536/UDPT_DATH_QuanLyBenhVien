@@ -1,0 +1,12 @@
+package com.doanth.medical_service.dto;
+
+import java.time.LocalDateTime;
+
+public class MedicalRecordShortDTO {
+    private int medicalRecordId;
+    private int doctorId;
+    private String doctorName;
+    private String status;
+    private String healthCondition;
+    private LocalDateTime createdAt;
+}

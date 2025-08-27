@@ -117,7 +117,7 @@
                 <div class="card-icon">📁</div>
                 <h2>Hồ sơ bệnh án</h2>
                 <p>Xem lại các hồ sơ bệnh án</p>
-                <a href="#" class="card-btn">Xem hồ sơ</a>
+                <a th:href="${#authentication.principal.authResponse.role == 'benhnhan'} ? @{/medical-records} : '#'" class="card-btn">Xem hồ sơ</a>
             </div>
         </div>
     </div>

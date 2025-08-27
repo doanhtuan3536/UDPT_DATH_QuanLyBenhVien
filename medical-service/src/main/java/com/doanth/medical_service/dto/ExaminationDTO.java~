@@ -1,0 +1,21 @@
+package com.doanth.medical_service.dto;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public class ExaminationDTO {
+    private int examinationId;
+
+    private int doctorId;
+    private String doctorName;
+
+    private LocalDate date;
+
+    private LocalTime time;
+
+    private String subjective_note;
+
+    private String objective_note;
+
+    private String assessment_note;
+}

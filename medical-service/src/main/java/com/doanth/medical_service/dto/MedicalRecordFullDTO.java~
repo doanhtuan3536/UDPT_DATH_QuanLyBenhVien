@@ -1,0 +1,18 @@
+package com.doanth.medical_service.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class MedicalRecordFullDTO {
+    private int medicalRecordId;
+    private int userId;
+    private int doctorId;
+    private String doctorName;
+    private String status;
+    private String dischargeSummary;
+    private String healthCondition;
+    private LocalDateTime createdAt;
+    List<ExaminationDTO> examinations;
+
+//    private List<Examination> examinations;
+}

@@ -1,0 +1,55 @@
+package com.doanth.medical_service.security;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+public class User {
+     private Integer userId;
+     private String username;
+     private String role;
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+        authorities.add(new SimpleGrantedAuthority(this.getRole()));
+
+        return authorities;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", role='" + role + '\'' +
+                '}';
+    }
+}

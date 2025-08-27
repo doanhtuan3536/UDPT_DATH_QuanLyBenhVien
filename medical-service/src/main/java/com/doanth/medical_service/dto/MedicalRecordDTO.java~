@@ -1,0 +1,2 @@
+package com.doanth.medical_service.dto;public class MedicalRecordDTO {
+}

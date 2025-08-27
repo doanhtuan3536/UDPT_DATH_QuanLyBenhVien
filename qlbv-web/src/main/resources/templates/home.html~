@@ -99,7 +99,7 @@
         </section>
 
         <div class="dashboard">
-            <div class="card appointment">
+            <div class="card appointment" sec:authorize="isAuthenticated() and (#authentication.principal.authResponse.role == 'benhnhan')">
                 <div class="card-icon">📅</div>
                 <h2>Đặt lịch khám</h2>
                 <p>Đặt lịch khám mới với bác sĩ chuyên khoa phù hợp với nhu cầu của bạn</p>
@@ -117,7 +117,7 @@
                 <div class="card-icon">📁</div>
                 <h2>Hồ sơ bệnh án</h2>
                 <p>Xem lại các hồ sơ bệnh án</p>
-                <a href="#" class="card-btn">Xem hồ sơ</a>
+                <a th:href="${#authentication.principal.authResponse.role == 'benhnhan'} ? @{/medical-records} : '#'"" class="card-btn">Xem hồ sơ</a>
             </div>
         </div>
     </div>
