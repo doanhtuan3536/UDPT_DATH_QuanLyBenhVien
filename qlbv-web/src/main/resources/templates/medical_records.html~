@@ -102,13 +102,6 @@
 </head>
 <body class="bg-light">
 <div class="wrapper">
-    <!--    <header class="header">-->
-    <!--        <div class="logo">Hệ thống Quản lý Bệnh viện</div>-->
-    <!--        <div class="user-info" sec:authorize="isAuthenticated()">-->
-    <!--            <span th:text="'Xin chào, ' + (${#authentication.principal.hoten} ?: ${#authentication.principal.userName})"></span>-->
-    <!--            <a href="/logout">Đăng xuất</a>-->
-    <!--        </div>-->
-    <!--    </header>-->
     <div th:replace="header :: header">...</div>
 
     <div class="container mt-4">
@@ -129,69 +122,55 @@
                     <i class="fas fa-info-circle me-2"></i>Dưới đây là toàn bộ hồ sơ bệnh án của bạn tại bệnh viện.
                 </div>
 
-                <!-- Medical Records Grid -->
-                <div class="row" id="medicalRecordsList">
-                    <!-- Record Item 1 -->
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card card-hover h-100 shadow-sm">
-                            <div class="card-body">
-                                <span class="badge bg-success status-badge">Đã kết thúc</span>
-                                <h6 class="card-title text-primary">HSBA-2023-0015</h6>
-                                <div class="d-flex align-items-center mb-2">
-                                    <!--                                <img src="/api/placeholder/40/40" alt="Bác sĩ" class="doctor-avatar me-2">-->
-                                    <div>
-                                        <small class="text-muted">Bác sĩ điều trị</small>
-                                        <p class="mb-0 fw-bold">BS. Nguyễn Văn A</p>
+                <!-- Check if there are medical records -->
+                <div th:if="${medicalRecords != null and !medicalRecords.empty}">
+                    <!-- Medical Records Grid -->
+                    <div class="row" id="medicalRecordsList">
+                        <!-- Record Item Template -->
+                        <div th:each="record : ${medicalRecords}" class="col-md-6 col-lg-4 mb-4">
+                            <div class="card card-hover h-100 shadow-sm">
+                                <div class="card-body position-relative">
+                                    <!-- Status Badge -->
+                                    <span th:classappend="${record.status == 'discharged'} ? 'bg-success' : 'bg-warning text-dark'"
+                                          class="badge status-badge">
+                                            <span th:text="${record.status == 'discharged'} ? 'Đã kết thúc' : 'Đang điều trị'"></span>
+                                        </span>
+
+                                    <!-- Record ID -->
+                                    <h6 class="card-title text-primary" th:text="'HSBA-' + ${record.medicalRecordId}">HSBA-2023-0015</h6>
+
+                                    <!-- Doctor Information -->
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div>
+                                            <small class="text-muted">Bác sĩ điều trị</small>
+                                            <p class="mb-0 fw-bold" th:text="'BS. ' + ${record.doctorName} + '(id: '+ ${record.doctorId} + ')'">BS. Nguyễn Văn A</p>
+                                        </div>
                                     </div>
+
+                                    <!-- Created Date -->
+                                    <div class="mb-2">
+                                        <small class="text-muted">Ngày tạo:</small>
+                                        <p class="mb-0" th:text="${#temporals.format(record.createdAt, 'dd/MM/yyyy')}">25/10/2023</p>
+                                    </div>
+
+                                    <!-- Health Condition -->
+                                    <div class="mb-3">
+                                        <small class="text-muted">Tình trạng:</small>
+                                        <p class="mb-0 text-truncate" th:text="${record.healthCondition}">Đau dạ dày cấp, đã ổn định sau điều trị...</p>
+                                    </div>
+
+                                    <!-- View Details Button -->
+                                    <a th:href="@{'/medical-records/details/' + ${record.medicalRecordId}}" class="btn btn-primary w-100">
+                                        <i class="fas fa-eye me-1"></i> Xem Chi Tiết
+                                    </a>
                                 </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Ngày tạo:</small>
-                                    <p class="mb-0">25/10/2023</p>
-                                </div>
-                                <div class="mb-3">
-                                    <small class="text-muted">Tình trạng:</small>
-                                    <p class="mb-0 text-truncate">Đau dạ dày cấp, đã ổn định sau điều trị...</p>
-                                </div>
-                                <a href="/medical-records/details/1" class="btn btn-primary w-100">
-                                    <i class="fas fa-eye me-1"></i> Xem Chi Tiết
-                                </a>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Record Item 2 -->
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card card-hover h-100 shadow-sm">
-                            <div class="card-body">
-                                <span class="badge bg-warning text-dark status-badge">Đang điều trị</span>
-                                <h6 class="card-title text-primary">HSBA-2023-0008</h6>
-                                <div class="d-flex align-items-center mb-2">
-                                    <!--                                <img src="/api/placeholder/40/40" alt="Bác sĩ" class="doctor-avatar me-2">-->
-                                    <div>
-                                        <small class="text-muted">Bác sĩ điều trị</small>
-                                        <p class="mb-0 fw-bold">BS. Trần Thị B</p>
-                                    </div>
-                                </div>
-                                <div class="mb-2">
-                                    <small class="text-muted">Ngày tạo:</small>
-                                    <p class="mb-0">12/05/2023</p>
-                                </div>
-                                <div class="mb-3">
-                                    <small class="text-muted">Tình trạng:</small>
-                                    <p class="mb-0 text-truncate">Gãy xương đùi, đang phục hồi chức năng...</p>
-                                </div>
-                                <a href="/medical-records/details/1" class="btn btn-primary w-100">
-                                    <i class="fas fa-eye me-1"></i> Xem Chi Tiết
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Thêm các hồ sơ khác ở đây -->
                 </div>
 
-                <!-- Empty State -->
-                <div class="text-center py-5 d-none" id="emptyState">
+                <!-- Empty State (shown when no records) -->
+                <div th:if="${medicalRecords == null or medicalRecords.empty}" class="text-center py-5" id="emptyState">
                     <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">Bạn chưa có hồ sơ bệnh án nào</h5>
                     <p class="text-muted">Tất cả hồ sơ bệnh án của bạn sẽ được hiển thị tại đây</p>

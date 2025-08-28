@@ -145,7 +145,7 @@
                             <div class="mb-3">
                                 <label class="fw-bold text-muted">Bác sĩ điều trị chính:</label>
                                 <div class="d-flex align-items-center">
-                                    <span th:text="'BS. ' + ${record.doctorName}">BS. Nguyễn Văn A</span>
+                                    <span th:text="'BS. ' + ${record.doctorName} + ' (id: '+ ${record.doctorId} + ')'">BS. Nguyễn Văn A</span>
                                 </div>
                             </div>
                         </div>
@@ -193,7 +193,7 @@
                                                 <span th:text="${#temporals.format(exam.date, 'dd/MM/yyyy')}">27/10/2023</span> -
                                                 <span th:text="${exam.time}">08:30</span>
                                             </h6>
-                                            <small class="text-muted" th:text="'BS. ' + ${exam.doctorName}">BS. Trần Thị C</small>
+                                            <small class="text-muted" th:text="'BS. ' + ${exam.doctorName} + ' (id: '+ ${exam.doctorId} + ')'">BS. Trần Thị C</small>
                                         </div>
                                         <button class="btn btn-sm btn-outline-primary" th:attr="data-bs-target='#examDetail' + ${iterStat.index}" data-bs-toggle="collapse">
                                             <i class="fas fa-chevron-down"></i>

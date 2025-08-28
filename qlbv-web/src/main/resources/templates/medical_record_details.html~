@@ -115,13 +115,6 @@
 </head>
 <body class="bg-light">
 <div class="wrapper">
-    <!--    <header class="header">-->
-    <!--        <div class="logo">Hệ thống Quản lý Bệnh viện</div>-->
-    <!--        <div class="user-info" sec:authorize="isAuthenticated()">-->
-    <!--            <span th:text="'Xin chào, ' + (${#authentication.principal.hoten} ?: ${#authentication.principal.userName})"></span>-->
-    <!--            <a href="/logout">Đăng xuất</a>-->
-    <!--        </div>-->
-    <!--    </header>-->
     <div th:replace="header :: header">...</div>
     <div class="container mt-4">
         <!-- Breadcrumb -->
@@ -129,133 +122,116 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/home">Trang Chủ</a></li>
                 <li class="breadcrumb-item"><a href="/medical-records">Hồ Sơ Bệnh Án</a></li>
-                <li class="breadcrumb-item active">HSBA-2023-0015</li>
+                <li class="breadcrumb-item active" th:text="'HSBA-' + ${record.medicalRecordId}">HSBA-2023-0015</li>
             </ol>
         </nav>
 
-        <!-- Medical Record Header -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-file-medical me-2"></i>HỒ SƠ BỆNH ÁN #HSBA-2023-0015
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted">Ngày tạo hồ sơ:</label>
-                            <p class="mb-0">25/10/2023</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted">Bác sĩ điều trị chính:</label>
-                            <div class="d-flex align-items-center">
-<!--                                <img src="/api/placeholder/50/50" alt="Bác sĩ" class="rounded-circle me-2">-->
-                                <span>BS. Nguyễn Văn A</span>
+        <!-- Check if record exists -->
+        <div th:if="${record != null}">
+            <!-- Medical Record Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-medical me-2"></i>HỒ SƠ BỆNH ÁN #HSBA-<span th:text="${record.medicalRecordId}">0015</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold text-muted">Ngày tạo hồ sơ:</label>
+                                <p class="mb-0" th:text="${#temporals.format(record.createdAt, 'dd/MM/yyyy')}">25/10/2023</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted">Tình trạng hiện tại:</label>
-                            <span class="badge bg-success">Đã kết thúc điều trị</span>
-                        </div>
-                        <div class="mb-3">
-                            <label class="fw-bold text-muted">Tóm tắt điều trị:</label>
-                            <p class="mb-0">Nhập viện vì đau bụng dữ dội. Đã nội soi và điều trị nội khoa. Sức khỏe ổn định và xuất viện sau 3 ngày.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <label class="fw-bold text-muted">Tình trạng sức khỏe chi tiết:</label>
-                    <div class="border rounded p-3 bg-light">
-                        <p class="mb-0">Bệnh nhân nhập viện với triệu chứng đau bụng vùng thượng vị. Kết quả nội soi chẩn đoán viêm dạ dày cấp. Đã điều trị bằng thuốc kháng acid và thay đổi chế độ ăn uống. Tình trạng ổn định, cần tái khám sau 1 tuần.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Examination History -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-history me-2"></i>LỊCH SỬ THĂM KHÁM
-                </h5>
-            </div>
-            <div class="card-body">
-                <!-- Timeline View for Examinations -->
-                <div class="timeline">
-                    <!-- Examination Item 1 -->
-                    <div class="timeline-item">
-                        <div class="card exam-card mb-3">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0">27/10/2023 - 08:30</h6>
-                                    <small class="text-muted">BS. Trần Thị C</small>
+                            <div class="mb-3">
+                                <label class="fw-bold text-muted">Bác sĩ điều trị chính:</label>
+                                <div class="d-flex align-items-center">
+                                    <span th:text="'BS. ' + ${record.doctorName} + '(id: '+ ${record.doctorId} + ')'">BS. Nguyễn Văn A</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#examDetail1">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
                             </div>
-                            <div class="card-body">
-                                <p class="card-text"><strong>Chẩn đoán:</strong> Kiểm tra cuối đợt điều trị, tình trạng ổn định</p>
-                                <div class="collapse" id="examDetail1">
-                                    <div class="mt-3">
-                                        <h6>Triệu chứng chủ quan:</h6>
-                                        <p class="text-muted">Bệnh nhân cho biết không còn đau bụng, ăn uống ngon miệng.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="fw-bold text-muted">Tình trạng hiện tại:</label>
+                                <span th:classappend="${record.status == 'discharged'} ? 'bg-success' : 'bg-warning'"
+                                      class="badge" th:text="${record.status == 'discharged'} ? 'Đã kết thúc điều trị' : 'Đang điều trị'">
+                                        Đã kết thúc điều trị
+                                    </span>
+                            </div>
+                            <div class="mb-3" th:if="${record.dischargeSummary != null and !record.dischargeSummary.isEmpty()}">
+                                <label class="fw-bold text-muted">Tóm tắt điều trị:</label>
+                                <p class="mb-0" th:text="${record.dischargeSummary}">Nhập viện vì đau bụng dữ dội. Đã nội soi và điều trị nội khoa. Sức khỏe ổn định và xuất viện sau 3 ngày.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3" th:if="${record.healthCondition != null and !record.healthCondition.isEmpty()}">
+                        <label class="fw-bold text-muted">Tình trạng sức khỏe chi tiết:</label>
+                        <div class="border rounded p-3 bg-light">
+                            <p class="mb-0" th:text="${record.healthCondition}">Bệnh nhân nhập viện với triệu chứng đau bụng vùng thượng vị. Kết quả nội soi chẩn đoán viêm dạ dày cấp. Đã điều trị bằng thuốc kháng acid và thay đổi chế độ ăn uống. Tình trạng ổn định, cần tái khám sau 1 tuần.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                                        <h6>Triệu chứng khách quan:</h6>
-                                        <p class="text-muted">Da dẻ hồng hào, bụng mềm, không đau khi ấn.</p>
+            <!-- Examination History -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>LỊCH SỬ THĂM KHÁM
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Check if there are examinations -->
+                    <div th:if="${record.examinations != null and !record.examinations.empty}">
+                        <!-- Timeline View for Examinations -->
+                        <div class="timeline">
+                            <!-- Examination Item Template -->
+                            <div th:each="exam, iterStat : ${record.examinations}" class="timeline-item">
+                                <div class="card exam-card mb-3">
+                                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">
+                                                <span th:text="${#temporals.format(exam.date, 'dd/MM/yyyy')}">27/10/2023</span> -
+                                                <span th:text="${exam.time}">08:30</span>
+                                            </h6>
+                                            <small class="text-muted" th:text="'BS. ' + ${exam.doctorName} + ' (id: '+ ${exam.doctorId} + ')'">BS. Trần Thị C</small>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary" th:attr="data-bs-target='#examDetail' + ${iterStat.index}" data-bs-toggle="collapse">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text" th:if="${exam.assessment_note != null and !exam.assessment_note.isEmpty()}">
+                                            <strong>Chẩn đoán:</strong> <span th:text="${exam.assessment_note}">Kiểm tra cuối đợt điều trị, tình trạng ổn định</span>
+                                        </p>
+                                        <div th:attr="id='examDetail' + ${iterStat.index}" class="collapse">
+                                            <div class="mt-3">
+                                                <h6 th:if="${exam.subjective_note != null and !exam.subjective_note.isEmpty()}">Triệu chứng chủ quan:</h6>
+                                                <p class="text-muted" th:text="${exam.subjective_note}">Bệnh nhân cho biết không còn đau bụng, ăn uống ngon miệng.</p>
 
-                                        <h6>Kế hoạch điều trị:</h6>
-                                        <p class="text-muted">Cho xuất viện, hẹn tái khám sau 1 tuần.</p>
+                                                <h6 th:if="${exam.objective_note != null and !exam.objective_note.isEmpty()}">Triệu chứng khách quan:</h6>
+                                                <p class="text-muted" th:text="${exam.objective_note}">Da dẻ hồng hào, bụng mềm, không đau khi ấn.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Examination Item 2 -->
-                    <div class="timeline-item">
-                        <div class="card exam-card mb-3">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-0">26/10/2023 - 09:15</h6>
-                                    <small class="text-muted">BS. Nguyễn Văn A</small>
-                                </div>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="collapse" data-bs-target="#examDetail2">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text"><strong>Chẩn đoán:</strong> Theo dõi điều trị, tình trạng cải thiện tốt</p>
-                                <div class="collapse" id="examDetail2">
-                                    <div class="mt-3">
-                                        <h6>Triệu chứng chủ quan:</h6>
-                                        <p class="text-muted">Bệnh nhân báo cáo giảm đau đáng kể, có thể ăn cháo.</p>
-
-                                        <h6>Triệu chứng khách quan:</h6>
-                                        <p class="text-muted">Mạch, huyết áp ổn định. Bụng ấn đỡ đau hơn.</p>
-
-                                        <h6>Kế hoạch điều trị:</h6>
-                                        <p class="text-muted">Tiếp tục phác đồ điều trị hiện tại.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Empty State for Examinations -->
+                    <div th:if="${record.examinations == null or record.examinations.empty}" class="text-center py-4" id="emptyExams">
+                        <i class="fas fa-stethoscope fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">Chưa có lịch sử thăm khám nào cho hồ sơ này</p>
                     </div>
-
-                    <!-- Thêm các lần khám khác ở đây -->
-                </div>
-
-                <!-- Empty State for Examinations -->
-                <div class="text-center py-4 d-none" id="emptyExams">
-                    <i class="fas fa-stethoscope fa-2x text-muted mb-2"></i>
-                    <p class="text-muted mb-0">Chưa có lịch sử thăm khám nào cho hồ sơ này</p>
                 </div>
             </div>
         </div>
 
+        <!-- Show message if record doesn't exist -->
+        <div th:if="${record == null}" class="alert alert-warning text-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>Không tìm thấy thông tin hồ sơ bệnh án
+        </div>
+    </div>
 </div>
 
 <div th:replace="footer :: footer">...</div>
