@@ -18,7 +18,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // disable only for testing APIs
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/login", "/css/**", "/js/**", "/assets/**", "/signup").permitAll()
-                        .requestMatchers("/home", "/appointments/no-auth/add", "/").permitAll()
+                        .requestMatchers("/home", "/appointments/no-auth/add").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

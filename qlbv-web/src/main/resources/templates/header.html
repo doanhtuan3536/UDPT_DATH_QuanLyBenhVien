@@ -5,4 +5,9 @@
         + (${#authentication.principal.hoten} ?: ${#authentication.principal.userName})"></span>
         <a href="/logout">Đăng xuất</a>
     </div>
+    <div class="user-info" sec:authorize="!isAuthenticated()">
+<!--        <span th:text="'Xin chào, ' + (${#authentication.principal.authResponse.role == 'bacsi'} ? 'Bác sĩ ' : '')-->
+<!--        + (${#authentication.principal.hoten} ?: ${#authentication.principal.userName})"></span>-->
+        <a href="/login">Đăng Nhập</a>
+    </div>
 </header>

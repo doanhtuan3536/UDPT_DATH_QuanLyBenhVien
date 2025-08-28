@@ -45,4 +45,13 @@ public class MedicalController {
         model.addAttribute("record", medicalRecordFullDTO);
         return "medical_record_details";
     }
+
+    @GetMapping("/prescriptions/{id}")
+    public String prescriptions(@PathVariable("id") Integer id, Model model) throws RefreshTokenException, JwtValidationException {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+//        String accessToken = loggedUser.getAccessToken();
+//        MedicalRecordFullDTO medicalRecordFullDTO = medicalServiceClient.getRecordDetailsByRecordId(accessToken, id);
+        return "prescription_details";
+    }
 }

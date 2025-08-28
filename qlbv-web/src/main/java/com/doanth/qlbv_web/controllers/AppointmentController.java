@@ -97,6 +97,19 @@ public class AppointmentController {
         return "appointment_add";
     }
 
+    @GetMapping("/no-auth/add")
+    public String addAppointmentNoAuth(Model model) throws RefreshTokenException, JwtValidationException {
+        String accessToken = authServiceClient.serviceLogin(serviceUsername, secretPassword);
+        List<Specialty> specialties = appointmentServiceClient.getSpecialties(accessToken);
+        System.out.println(specialties);
+        model.addAttribute("specialties", specialties);
+//        model.addAttribute("bookingForm", new BookingForm());
+//        if (!model.containsAttribute("bookingForm")) {
+//            model.addAttribute("bookingForm", new AppointmentInfo());
+//        }
+        return "appointments_no_auth";
+    }
+
     @PostMapping("/add")
     public String addAppointment(@ModelAttribute("bookingForm") AppointmentInfo form , @RequestParam("hour") int hour,
                                  @RequestParam("minute") int minute, RedirectAttributes redirectAttributes) throws RefreshTokenException, JwtValidationException {

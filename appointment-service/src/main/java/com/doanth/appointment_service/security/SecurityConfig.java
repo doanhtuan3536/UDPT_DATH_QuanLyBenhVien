@@ -18,7 +18,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                         auth -> auth.requestMatchers(HttpMethod.GET,"/api/appointments/specialties")
-                                .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
+                                .hasAnyAuthority("benhnhan", "bacsi", "nhanvien", "service")
                         .requestMatchers(HttpMethod.POST,"/api/appointments")
                                 .hasAnyAuthority("benhnhan", "nhanvien")
                                 .requestMatchers(HttpMethod.GET,"/api/appointments")

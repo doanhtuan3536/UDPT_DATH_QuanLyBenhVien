@@ -31,7 +31,7 @@ public class MedicalController {
         AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
         String accessToken = loggedUser.getAccessToken();
         List<MedicalRecordShortDTO> medicalRecordShortDTOSDTO = medicalServiceClient.getRecordsByPatientId(accessToken);
-        System.out.println(medicalRecordShortDTOSDTO);
+//        System.out.println(medicalRecordShortDTOSDTO);
         model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
         return "medical_records";
     }
@@ -41,8 +41,17 @@ public class MedicalController {
         AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
         String accessToken = loggedUser.getAccessToken();
         MedicalRecordFullDTO medicalRecordFullDTO = medicalServiceClient.getRecordDetailsByRecordId(accessToken, id);
-        System.out.println(medicalRecordFullDTO);
+//        System.out.println(medicalRecordFullDTO);
         model.addAttribute("record", medicalRecordFullDTO);
         return "medical_record_details";
+    }
+
+    @GetMapping("/prescriptions/{id}")
+    public String prescriptions(@PathVariable("id") Integer id, Model model) throws RefreshTokenException, JwtValidationException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+        String accessToken = loggedUser.getAccessToken();
+        MedicalRecordFullDTO medicalRecordFullDTO = medicalServiceClient.getRecordDetailsByRecordId(accessToken, id);
+        return "prescription_details";
     }
 }

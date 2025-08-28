@@ -106,6 +106,13 @@
                 <a href="/appointments/add" class="card-btn">Đặt lịch ngay</a>
             </div>
 
+            <div class="card appointment" sec:authorize="!isAuthenticated()">
+                <div class="card-icon">📅</div>
+                <h2>Đặt lịch khám</h2>
+                <p>Đặt lịch khám mới với bác sĩ chuyên khoa phù hợp với nhu cầu của bạn</p>
+                <a href="/appointments/no-auth/add" class="card-btn">Đặt lịch ngay</a>
+            </div>
+
             <div class="card history" sec:authorize="isAuthenticated()">
                 <div class="card-icon">📋</div>
                 <h2 th:text="${#authentication.principal.authResponse.role == 'benhnhan'} ? 'Lịch sử đặt khám' : 'Lịch bệnh nhân đặt khám'"></h2>
@@ -113,7 +120,7 @@
                 <a href="/appointments" class="card-btn">Xem lịch sử</a>
             </div>
 
-            <div class="card PatientRecord">
+            <div class="card PatientRecord" sec:authorize="isAuthenticated()">
                 <div class="card-icon">📁</div>
                 <h2>Hồ sơ bệnh án</h2>
                 <p>Xem lại các hồ sơ bệnh án</p>
