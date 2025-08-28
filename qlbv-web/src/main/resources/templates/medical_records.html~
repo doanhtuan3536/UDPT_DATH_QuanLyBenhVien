@@ -111,8 +111,93 @@
     <!--    </header>-->
     <div th:replace="header :: header">...</div>
 
-    <div class="container">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-primary">
+                        <i class="fas fa-file-medical me-2"></i>DANH SÁCH HỒ SƠ BỆNH ÁN
+                    </h2>
+                    <a href="/home" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-1"></i> Về Trang Chủ
+                    </a>
+                </div>
 
+                <!-- Alert Box -->
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Dưới đây là toàn bộ hồ sơ bệnh án của bạn tại bệnh viện.
+                </div>
+
+                <!-- Medical Records Grid -->
+                <div class="row" id="medicalRecordsList">
+                    <!-- Record Item 1 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card card-hover h-100 shadow-sm">
+                            <div class="card-body">
+                                <span class="badge bg-success status-badge">Đã kết thúc</span>
+                                <h6 class="card-title text-primary">HSBA-2023-0015</h6>
+                                <div class="d-flex align-items-center mb-2">
+                                    <!--                                <img src="/api/placeholder/40/40" alt="Bác sĩ" class="doctor-avatar me-2">-->
+                                    <div>
+                                        <small class="text-muted">Bác sĩ điều trị</small>
+                                        <p class="mb-0 fw-bold">BS. Nguyễn Văn A</p>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Ngày tạo:</small>
+                                    <p class="mb-0">25/10/2023</p>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">Tình trạng:</small>
+                                    <p class="mb-0 text-truncate">Đau dạ dày cấp, đã ổn định sau điều trị...</p>
+                                </div>
+                                <a href="/medical-records/details/1" class="btn btn-primary w-100">
+                                    <i class="fas fa-eye me-1"></i> Xem Chi Tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Record Item 2 -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card card-hover h-100 shadow-sm">
+                            <div class="card-body">
+                                <span class="badge bg-warning text-dark status-badge">Đang điều trị</span>
+                                <h6 class="card-title text-primary">HSBA-2023-0008</h6>
+                                <div class="d-flex align-items-center mb-2">
+                                    <!--                                <img src="/api/placeholder/40/40" alt="Bác sĩ" class="doctor-avatar me-2">-->
+                                    <div>
+                                        <small class="text-muted">Bác sĩ điều trị</small>
+                                        <p class="mb-0 fw-bold">BS. Trần Thị B</p>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Ngày tạo:</small>
+                                    <p class="mb-0">12/05/2023</p>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">Tình trạng:</small>
+                                    <p class="mb-0 text-truncate">Gãy xương đùi, đang phục hồi chức năng...</p>
+                                </div>
+                                <a href="/medical-records/details/1" class="btn btn-primary w-100">
+                                    <i class="fas fa-eye me-1"></i> Xem Chi Tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thêm các hồ sơ khác ở đây -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="text-center py-5 d-none" id="emptyState">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Bạn chưa có hồ sơ bệnh án nào</h5>
+                    <p class="text-muted">Tất cả hồ sơ bệnh án của bạn sẽ được hiển thị tại đây</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -120,94 +205,7 @@
 
 
 <!-- Main Content -->
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <!-- Page Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="text-primary">
-                    <i class="fas fa-file-medical me-2"></i>DANH SÁCH HỒ SƠ BỆNH ÁN
-                </h2>
-                <a href="/home" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left me-1"></i> Về Trang Chủ
-                </a>
-            </div>
 
-            <!-- Alert Box -->
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>Dưới đây là toàn bộ hồ sơ bệnh án của bạn tại bệnh viện.
-            </div>
-
-            <!-- Medical Records Grid -->
-            <div class="row" id="medicalRecordsList">
-                <!-- Record Item 1 -->
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card card-hover h-100 shadow-sm">
-                        <div class="card-body">
-                            <span class="badge bg-success status-badge">Đã kết thúc</span>
-                            <h6 class="card-title text-primary">HSBA-2023-0015</h6>
-                            <div class="d-flex align-items-center mb-2">
-<!--                                <img src="/api/placeholder/40/40" alt="Bác sĩ" class="doctor-avatar me-2">-->
-                                <div>
-                                    <small class="text-muted">Bác sĩ điều trị</small>
-                                    <p class="mb-0 fw-bold">BS. Nguyễn Văn A</p>
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Ngày tạo:</small>
-                                <p class="mb-0">25/10/2023</p>
-                            </div>
-                            <div class="mb-3">
-                                <small class="text-muted">Tình trạng:</small>
-                                <p class="mb-0 text-truncate">Đau dạ dày cấp, đã ổn định sau điều trị...</p>
-                            </div>
-                            <a href="/medical-records/details/15" class="btn btn-primary w-100">
-                                <i class="fas fa-eye me-1"></i> Xem Chi Tiết
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Record Item 2 -->
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card card-hover h-100 shadow-sm">
-                        <div class="card-body">
-                            <span class="badge bg-warning text-dark status-badge">Đang điều trị</span>
-                            <h6 class="card-title text-primary">HSBA-2023-0008</h6>
-                            <div class="d-flex align-items-center mb-2">
-<!--                                <img src="/api/placeholder/40/40" alt="Bác sĩ" class="doctor-avatar me-2">-->
-                                <div>
-                                    <small class="text-muted">Bác sĩ điều trị</small>
-                                    <p class="mb-0 fw-bold">BS. Trần Thị B</p>
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <small class="text-muted">Ngày tạo:</small>
-                                <p class="mb-0">12/05/2023</p>
-                            </div>
-                            <div class="mb-3">
-                                <small class="text-muted">Tình trạng:</small>
-                                <p class="mb-0 text-truncate">Gãy xương đùi, đang phục hồi chức năng...</p>
-                            </div>
-                            <a href="/medical-records/details/15" class="btn btn-primary w-100">
-                                <i class="fas fa-eye me-1"></i> Xem Chi Tiết
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Thêm các hồ sơ khác ở đây -->
-            </div>
-
-            <!-- Empty State -->
-            <div class="text-center py-5 d-none" id="emptyState">
-                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">Bạn chưa có hồ sơ bệnh án nào</h5>
-                <p class="text-muted">Tất cả hồ sơ bệnh án của bạn sẽ được hiển thị tại đây</p>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
