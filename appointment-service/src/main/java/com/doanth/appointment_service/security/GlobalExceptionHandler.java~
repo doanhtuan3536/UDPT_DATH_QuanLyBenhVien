@@ -18,13 +18,13 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(JwtValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     public ErrorDTO handleJwtValidationException(HttpServletRequest request, Exception ex) {
         ErrorDTO error = new ErrorDTO();
 
         error.setTimestamp(new Date());
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
         error.addError(ex.getMessage());
         error.setPath(request.getServletPath());
         return error;

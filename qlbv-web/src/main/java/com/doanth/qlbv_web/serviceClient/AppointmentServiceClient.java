@@ -97,13 +97,30 @@ public class AppointmentServiceClient {
                 newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
                 newHeaders.setContentType(MediaType.APPLICATION_JSON);
                 HttpEntity<AppointmentInfo> newRequest = new HttpEntity<>(form,newHeaders);
-                response = restTemplate.exchange(
-                        AppointmentsUrl,
-                        HttpMethod.POST,
-                        newRequest,
-                        AppointmentInfo.class
-                );
-                return response.getBody();
+
+                try{
+                    response = restTemplate.exchange(
+                            AppointmentsUrl,
+                            HttpMethod.POST,
+                            newRequest,
+                            AppointmentInfo.class
+                    );
+                    return response.getBody();
+                }catch(HttpClientErrorException ex){
+                    ErrorDTO error1 = ex.getResponseBodyAs(ErrorDTO.class);
+                    error1.getErrors().forEach((errorMsg)-> {
+                        if (errorMsg.contains("Specialty does not work on")){
+                            throw new SpecialtyWorkDaysException();
+                        }
+                        else if (errorMsg.contains("No specialty found with the given id")){
+                            throw new SpecialtyNotFoundException();
+                        }
+                        else if (errorMsg.contains("Appointment time not within working hours")){
+                            throw new AppointmentTimeNotBetweenWorkingHoursException();
+                        }
+                    });
+                }
+
 
             }
             error.getErrors().forEach((errorMsg)-> {
