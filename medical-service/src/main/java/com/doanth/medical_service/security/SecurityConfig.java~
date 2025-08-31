@@ -19,7 +19,9 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                         auth -> auth.requestMatchers(HttpMethod.GET,"/api/medical/records/*")
                                 .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
-                        auth.requestMatchers(HttpMethod.GET,"/api/medical/records/*")
+                                .requestMatchers(HttpMethod.GET,"/api/medical/records")
+                                .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
+                                .requestMatchers(HttpMethod.GET,"/api/medical/prescription/details")
                                 .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
 //                        .requestMatchers(HttpMethod.POST,"/api/appointments")
 //                                .hasAnyAuthority("benhnhan", "nhanvien")

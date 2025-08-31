@@ -1,13 +1,13 @@
 package com.doanth.medical_service;
 
-import com.doanth.medical_service.dto.DoctorInfoDTO;
-import com.doanth.medical_service.dto.ExaminationDTO;
-import com.doanth.medical_service.dto.MedicalRecordFullDTO;
-import com.doanth.medical_service.dto.MedicalRecordShortDTO;
+import com.doanth.medical_service.dto.*;
 import com.doanth.medical_service.models.MedicalRecord;
+import com.doanth.medical_service.models.Prescription;
+import com.doanth.medical_service.models.PrescriptionDetail;
 import com.doanth.medical_service.security.JwtValidationException;
 import com.doanth.medical_service.security.User;
 import com.doanth.medical_service.service.MedicalRecordService;
+import com.doanth.medical_service.service.PrescriptionService;
 import com.doanth.medical_service.serviceClient.AuthServiceClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,16 +28,18 @@ public class MedicalController {
     private final MedicalRecordService medicalRecordService;
     private ModelMapper modelMapper;
     private AuthServiceClient authServiceClient;
+    private PrescriptionService prescriptionService;
     @Value("${service.auth.username}")
     private String serviceUsername;
 
     @Value("${service.auth.password}")
     private String secretPassword;
 
-    public MedicalController(MedicalRecordService medicalRecordService, ModelMapper modelMapper, AuthServiceClient authServiceClient) {
+    public MedicalController(MedicalRecordService medicalRecordService, ModelMapper modelMapper, AuthServiceClient authServiceClient, PrescriptionService prescriptionService) {
         this.medicalRecordService = medicalRecordService;
         this.modelMapper = modelMapper;
         this.authServiceClient = authServiceClient;
+        this.prescriptionService = prescriptionService;
     }
 
     @GetMapping("/records")
@@ -54,7 +56,7 @@ public class MedicalController {
         String accessToken = authServiceClient.login(serviceUsername, secretPassword);
         int size = medicalRecordShortDTOS.size();
         for (int i = 0; i < size; i++) {
-            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getDoctorInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
+            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getUserInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
         }
         return ResponseEntity.ok(medicalRecordShortDTOS);
     }
@@ -62,12 +64,12 @@ public class MedicalController {
     public ResponseEntity<?> medicalRecordDetails(@PathVariable("id") Integer medicalRecordId) throws JwtValidationException {
         MedicalRecord medicalRecord = medicalRecordService.getMedicalRecord(medicalRecordId);
         String accessToken = authServiceClient.login(serviceUsername, secretPassword);
-        DoctorInfoDTO doctorInfoDTO = authServiceClient.getDoctorInfo(medicalRecord.getDoctorId(), accessToken);
+        UserInfoDTO userInfoDTO = authServiceClient.getUserInfo(medicalRecord.getDoctorId(), accessToken);
         MedicalRecordFullDTO medicalRecordfullDTO = entity2fullDTO(medicalRecord);
-        medicalRecordfullDTO.setDoctorName(doctorInfoDTO.getHoten());
+        medicalRecordfullDTO.setDoctorName(userInfoDTO.getHoten());
         if(medicalRecordfullDTO.getExaminations() != null) {
             for (ExaminationDTO examination : medicalRecordfullDTO.getExaminations()) {
-                examination.setDoctorName(authServiceClient.getDoctorInfo(examination.getDoctorId(), accessToken).getHoten());
+                examination.setDoctorName(authServiceClient.getUserInfo(examination.getDoctorId(), accessToken).getHoten());
             }
         }
 //        List<MedicalRecord> medicalRecords = medicalRecordService.listByPatientId(medicalRecordId);
@@ -77,8 +79,42 @@ public class MedicalController {
 //        for (int i = 0; i < size; i++) {
 //            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getDoctorInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
 //        }
-        return ResponseEntity.ok(medicalRecordShortDTOS);
+        return ResponseEntity.ok(medicalRecordfullDTO);
     }
+    @GetMapping("/prescription/details/{id}")
+    public ResponseEntity<?> prescriptionDetails(@PathVariable("id") Integer examinationId) throws JwtValidationException {
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        int patientId = user.getUserId();
+        int examId = examinationId;
+        Prescription prescription = prescriptionService.getPrescription(patientId, examId);
+        List<PrescriptionDetail> prescriptionDetail = prescription.getPrescriptionDetails();
+        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
+        UserInfoDTO userInfoDTO = authServiceClient.getUserInfo(patientId, accessToken);
+        PrescriptionDetailDTO prescriptionDetailDTO = new PrescriptionDetailDTO();
+        prescriptionDetailDTO.setPatientId(patientId);
+        prescriptionDetailDTO.setPatientName(userInfoDTO.getHoten());
+        prescriptionDetailDTO.setCreatedAt(prescription.getCreatedAt());
+        int doctorId = prescription.getExamination().getDoctorId();
+        prescriptionDetailDTO.setDoctorId(doctorId);
+        UserInfoDTO doctorInfoDTO = authServiceClient.getUserInfo(doctorId, accessToken);
+        prescriptionDetailDTO.setDoctorName(doctorInfoDTO.getHoten());
+        prescriptionDetailDTO.setStatus(prescription.getStatus());
+        double totalPrice = 0;
+        for (PrescriptionDetail prescriptionDetail1 : prescriptionDetail) {
+            totalPrice += prescriptionDetail1.getQuantity() * prescriptionDetail1.getMedicine().getPrice();
+            MedicineDTO medicineDTO = new MedicineDTO();
+            medicineDTO.setMedicineId(prescriptionDetail1.getMedicine().getMedicineId());
+            medicineDTO.setMedicineName(prescriptionDetail1.getMedicine().getMedicineName());
+            medicineDTO.setQuantity(prescriptionDetail1.getQuantity());
+            medicineDTO.setPrice(prescriptionDetail1.getMedicine().getPrice());
+            medicineDTO.setTotalPrice(prescriptionDetail1.getQuantity() * prescriptionDetail1.getMedicine().getPrice());
+            prescriptionDetailDTO.getMedicines().add(medicineDTO);
+        }
+        prescriptionDetailDTO.setTotalPrice(totalPrice);
+        return ResponseEntity.ok(prescriptionDetailDTO);
+    }
+
     private MedicalRecordShortDTO entity2DTO(MedicalRecord entity) {
         return modelMapper.map(entity, MedicalRecordShortDTO.class);
     }

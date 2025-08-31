@@ -1,0 +1,19 @@
+package com.doanth.medical_service.models;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "DANHMUCTHUOC")
+public class MedicineCategory {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "danhmucthuoc_id")
+    private int medicineCategoryId;
+
+    @Column(name = "tendanhmuc", nullable = false)
+    private String medicineCategoryName;
+
+    @Column(name = "mota")
+    @Lob
+    private String description;
+}

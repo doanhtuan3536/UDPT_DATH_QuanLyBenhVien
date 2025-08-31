@@ -21,6 +21,8 @@ public class SecurityConfig {
                                 .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
                                 .requestMatchers(HttpMethod.GET,"/api/medical/records")
                                 .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
+                                .requestMatchers(HttpMethod.GET,"/api/medical/prescription/details/*")
+                                .hasAnyAuthority("benhnhan", "bacsi", "nhanvien")
 //                        .requestMatchers(HttpMethod.POST,"/api/appointments")
 //                                .hasAnyAuthority("benhnhan", "nhanvien")
 //                                .requestMatchers(HttpMethod.GET,"/api/appointments")

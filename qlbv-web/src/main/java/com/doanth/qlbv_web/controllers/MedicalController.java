@@ -2,6 +2,7 @@ package com.doanth.qlbv_web.controllers;
 
 import com.doanth.qlbv_web.dto.MedicalRecordFullDTO;
 import com.doanth.qlbv_web.dto.MedicalRecordShortDTO;
+import com.doanth.qlbv_web.dto.PrescriptionDetailDTO;
 import com.doanth.qlbv_web.dto.UserDetails;
 import com.doanth.qlbv_web.serviceClient.AuthResponse;
 import com.doanth.qlbv_web.serviceClient.JwtValidationException;
@@ -46,12 +47,18 @@ public class MedicalController {
         return "medical_record_details";
     }
 
-    @GetMapping("/prescriptions/{id}")
-    public String prescriptions(@PathVariable("id") Integer id, Model model) throws RefreshTokenException, JwtValidationException {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
-//        String accessToken = loggedUser.getAccessToken();
+    @GetMapping("/prescriptions/{examinationId}/{medicalRecordId}")
+    public String prescriptions(@PathVariable("examinationId") Integer examinationId, @PathVariable("medicalRecordId") Integer medicalRecordId, Model model) throws RefreshTokenException, JwtValidationException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+        String accessToken = loggedUser.getAccessToken();
 //        MedicalRecordFullDTO medicalRecordFullDTO = medicalServiceClient.getRecordDetailsByRecordId(accessToken, id);
+        PrescriptionDetailDTO prescriptionDetailDTO = medicalServiceClient.getPrescriptionDetail(accessToken, examinationId);
+        System.out.println(prescriptionDetailDTO);
+        model.addAttribute("prescription", prescriptionDetailDTO);
+        // Thêm prescriptionId vào model để sử dụng trong breadcrumb
+        model.addAttribute("medicalRecordId", medicalRecordId);
+        model.addAttribute("examinationId", examinationId);
         return "prescription_details";
     }
 }

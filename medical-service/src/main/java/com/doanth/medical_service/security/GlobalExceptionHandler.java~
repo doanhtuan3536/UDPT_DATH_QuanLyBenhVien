@@ -1,7 +1,6 @@
 package com.doanth.medical_service.security;
 
 import com.doanth.medical_service.service.MedicalRecordNotFoundException;
-import com.doanth.medical_service.service.PresciptionDetailNotFoundException;
 import com.doanth.medical_service.serviceClient.AccessTokenForServiceException;
 import com.doanth.medical_service.serviceClient.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +27,7 @@ public class GlobalExceptionHandler {
         return error;
     }
 
-    @ExceptionHandler({MedicalRecordNotFoundException.class, PresciptionDetailNotFoundException.class})
+    @ExceptionHandler(MedicalRecordNotFoundException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public ErrorDTO handleMedicalRecordNotFoundException(HttpServletRequest request, Exception ex) {

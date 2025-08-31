@@ -210,9 +210,9 @@
 <!--                                            </a>-->
 <!--                                        </div>-->
                                         <div class="mt-2">
-                                            <a th:href="@{'/medical-records/prescriptions/1'"
+                                            <a th:href="@{'/medical-records/prescriptions/' + ${exam.examinationId} + '/' + ${record.medicalRecordId}}"
                                                class="btn btn-outline-success btn-sm">
-                                                <i class="fas fa-prescription me-1"></i> Xem đơn thuốc #
+                                                <i class="fas fa-prescription me-1"></i> Xem đơn thuốc # <span th:text="${exam.examinationId}">1</span>
                                             </a>
                                         </div>
                                         <div th:attr="id='examDetail' + ${iterStat.index}" class="collapse">

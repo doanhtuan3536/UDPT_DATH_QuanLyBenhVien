@@ -1,0 +1,43 @@
+package com.doanth.medical_service.models;
+
+import jakarta.persistence.*;
+
+@Embeddable
+public class PrescriptionId {
+    @Column(name = "benhnhan_id")
+    private int patientId;
+
+    @Column(name = "lichsukham_id")
+    private int  examinationId;
+
+    public PrescriptionId() {}
+
+    public PrescriptionId(int PatientId, int ExaminationId) {
+        this.patientId = PatientId;
+        this.examinationId = ExaminationId;
+    }
+
+    public int getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(int PatientId) {
+        this.patientId = PatientId;
+    }
+
+    public int getExaminationId() {
+        return examinationId;
+    }
+
+    public void setExaminationId(int ExaminationId) {
+        this.examinationId = ExaminationId;
+    }
+
+    @Override
+    public String toString() {
+        return "PrescriptionId{" +
+                "PatientId=" + patientId +
+                ", ExaminationId=" + examinationId +
+                '}';
+    }
+}

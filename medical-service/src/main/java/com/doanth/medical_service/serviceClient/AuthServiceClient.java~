@@ -79,7 +79,7 @@ public class AuthServiceClient {
         }
     }
 
-    public UserInfoDTO getUserInfo(Integer doctorId, String accessToken) throws JwtValidationException {
+    public UserInfoDTO getUsserInfo(Integer doctorId, String accessToken) throws JwtValidationException {
 //        Claims claims = validateAccessToken(AccessTokenJwt);
 //        return (DoctorInfoDTO) claims.get("doctorInfoDTO");
 //        String accessToken = login(serviceUsername, secretPassword);

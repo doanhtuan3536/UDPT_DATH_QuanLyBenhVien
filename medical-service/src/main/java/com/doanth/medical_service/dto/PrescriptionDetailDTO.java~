@@ -1,0 +1,17 @@
+package com.doanth.medical_service.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class PrescriptionDetailDTO {
+    private LocalDateTime createdAt;
+    private int patientId;
+    private String patientName;
+    private int doctorId;
+    private String doctorName;
+
+    private String status;
+    List<MedicineDTO> medicines;
+
+
+}

@@ -1,0 +1,102 @@
+package com.doanth.medical_service.models;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "DONTHUOC")
+public class Prescription {
+    @EmbeddedId
+    private PrescriptionId prescriptionId;
+
+
+    @OneToOne
+    @MapsId("examinationId")
+    @JoinColumn(name = "lichsukham_id")
+    private Examination examination;
+
+
+    @Column(name = "tinhtrang", nullable = false)
+    private String status;
+
+    @Column(name = "tongtien", nullable = false)
+    private Double totalPrice;
+
+    @Column(name = "ngaytao", nullable = false)
+    private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PrescriptionDetail> prescriptionDetails;
+
+    public Prescription() {}
+
+    public Prescription(PrescriptionId prescriptionId, Examination examination, String status, Double totalPrice, LocalDateTime createdAt) {
+        this.prescriptionId = prescriptionId;
+        this.examination = examination;
+        this.status = status;
+        this.totalPrice = totalPrice;
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Prescription{" +
+                "prescriptionId=" + prescriptionId +
+                ", examination=" + examination +
+                ", status='" + status + '\'' +
+                ", totalPrice=" + totalPrice +
+                ", createdAt=" + createdAt +
+                ", prescriptionDetails=" + prescriptionDetails +
+                '}';
+    }
+
+    public PrescriptionId getPrescriptionId() {
+        return prescriptionId;
+    }
+
+    public void setPrescriptionId(PrescriptionId prescriptionId) {
+        this.prescriptionId = prescriptionId;
+    }
+
+    public Examination getExamination() {
+        return examination;
+    }
+
+    public void setExamination(Examination examination) {
+        this.examination = examination;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<PrescriptionDetail> getPrescriptionDetails() {
+        return prescriptionDetails;
+    }
+
+    public void setPrescriptionDetails(List<PrescriptionDetail> prescriptionDetails) {
+        this.prescriptionDetails = prescriptionDetails;
+    }
+}

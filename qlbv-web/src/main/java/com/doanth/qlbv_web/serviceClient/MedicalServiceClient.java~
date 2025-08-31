@@ -3,6 +3,7 @@ package com.doanth.qlbv_web.serviceClient;
 import com.doanth.qlbv_web.dto.ErrorDTO;
 import com.doanth.qlbv_web.dto.MedicalRecordFullDTO;
 import com.doanth.qlbv_web.dto.MedicalRecordShortDTO;
+import com.doanth.qlbv_web.dto.PrescriptionDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -21,6 +22,7 @@ public class MedicalServiceClient {
     @Autowired
     private  AuthServiceClient authServiceClient;
     private final String getRecordsByPatientIdUrl = "http://localhost:8083/api/medical/records";
+    private final String getPrescriptionDetailsUrl = "http://localhost:8083/api/medical/prescription/details";
 
     public List<MedicalRecordShortDTO> getRecordsByPatientId(String accessToken) throws RefreshTokenException, JwtValidationException {
         HttpHeaders headers = new HttpHeaders();
@@ -68,7 +70,7 @@ public class MedicalServiceClient {
         ResponseEntity<MedicalRecordFullDTO> response = null;
         try {
             response = restTemplate.exchange(
-                    getRecordsByPatientIdUrl,
+                    newUrl,
                     HttpMethod.GET,
                     request,
                     MedicalRecordFullDTO.class
@@ -85,7 +87,7 @@ public class MedicalServiceClient {
                 newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
                 HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
                 response = restTemplate.exchange(
-                        getRecordsByPatientIdUrl,
+                        newUrl,
                         HttpMethod.GET,
                         newRequest,
                         MedicalRecordFullDTO.class
@@ -93,6 +95,52 @@ public class MedicalServiceClient {
                 return response.getBody();
 
             };
+            throw new JwtValidationException(e.getResponseBodyAsString());
+        }
+    }
+
+    public PrescriptionDetailDTO getPrescriptionDetail(String accessToken, Integer examinationId) throws RefreshTokenException, JwtValidationException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        String newUrl = getPrescriptionDetailsUrl + "/" + examinationId;
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<PrescriptionDetailDTO> response = null;
+        try {
+            response = restTemplate.exchange(
+                    newUrl,
+                    HttpMethod.GET,
+                    request,
+                    PrescriptionDetailDTO.class
+            );
+            System.out.println(response);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+//            System.out.println("catch AppointmentServiceClient getSpecialties HttpClientErrorException");
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+            if(error.getErrors().contains("Access token expired")){
+//                System.out.println("catch AppointmentServiceClient getSpecialties if Access token expired");
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
+                try {
+                    response = restTemplate.exchange(
+                            newUrl,
+                            HttpMethod.GET,
+                            newRequest,
+                            PrescriptionDetailDTO.class
+                    );
+                    return response.getBody();
+                }
+                catch (HttpClientErrorException ex){
+                    if(error.getErrors().contains("Prescription details not found")){
+                        return null;
+                    }
+                }
+
+            };
+
+
             throw new JwtValidationException(e.getResponseBodyAsString());
         }
     }

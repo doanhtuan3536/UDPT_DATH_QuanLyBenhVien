@@ -1,0 +1,26 @@
+package com.doanth.medical_service.service;
+
+import com.doanth.medical_service.models.PrescriptionDetail;
+import com.doanth.medical_service.repository.PrescriptionDetailRepo;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class PrescriptionDetailService {
+    private final PrescriptionDetailRepo prescriptionDetailRepo;
+
+    public PrescriptionDetailService(PrescriptionDetailRepo prescriptionDetailRepo) {
+        this.prescriptionDetailRepo = prescriptionDetailRepo;
+    }
+
+    public List<PrescriptionDetail> getPrescriptionDetail(Integer PatienId, Integer ExaminationId) {
+        List<PrescriptionDetail> prescriptionDetails = prescriptionDetailRepo.findByPatientIdAndExaminationId(PatienId, ExaminationId);
+
+        if(prescriptionDetail == null){
+            throw new PresciptionDetailNotFoundException("Prescription detail not found");
+        }
+
+        return prescriptionDetail;
+    }
+}
