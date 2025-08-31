@@ -110,7 +110,7 @@
                 <div class="card-icon">📅</div>
                 <h2>Đặt lịch khám</h2>
                 <p>Đặt lịch khám mới với bác sĩ chuyên khoa phù hợp với nhu cầu của bạn</p>
-                <a href="/appointments/no-auth" class="card-btn">Đặt lịch ngay</a>
+                <a href="/appointments/no-auth/add" class="card-btn">Đặt lịch ngay</a>
             </div>
 
             <div class="card history" sec:authorize="isAuthenticated()">

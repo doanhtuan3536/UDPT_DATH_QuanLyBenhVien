@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Hồ Sơ Bệnh Án - Hệ thống Quản lý Bệnh viện</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome cho biểu tượng -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/medical_records_add.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .wrapper {
+            flex-grow: 1;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 5%; /* Sử dụng phần trăm để responsive tốt hơn */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info a {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .user-info a:hover {
+            background-color: #c0392b;
+        }
+
+
+
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+                padding: 1rem;
+            }
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Header -->
+    <div th:replace="header :: header">...</div>
+
+    <div class="container">
+        <a href="danh-sach-ho-so.html" class="btn btn-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách hồ sơ
+        </a>
+
+        <h1 class="page-title">Thêm Hồ Sơ Bệnh Án</h1>
+
+        <div class="patient-info">
+            <h4><i class="fas fa-user-injured"></i> Thông tin bệnh nhân</h4>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>ID:</label>
+                    <span>BN001</span>
+                </div>
+                <div class="info-item">
+                    <label>Họ tên:</label>
+                    <span>Nguyễn Văn A</span>
+                </div>
+                <div class="info-item">
+                    <label>Ngày sinh:</label>
+                    <span>15/05/1990</span>
+                </div>
+                <div class="info-item">
+                    <label>Giới tính:</label>
+                    <span>Nam</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form thêm hồ sơ bệnh án -->
+        <div class="form-container">
+            <form action="#" method="post">
+                <div class="form-group">
+                    <label for="treatmentSummary">Tóm tắt quá trình điều trị *</label>
+                    <textarea id="treatmentSummary" name="treatmentSummary" class="form-control"
+                              placeholder="Mô tả chi tiết quá trình điều trị, phương pháp đã áp dụng, thuốc đã sử dụng..."
+                              required rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="healthCondition">Tình trạng sức khỏe *</label>
+                    <textarea id="healthCondition" name="healthCondition" class="form-control"
+                              placeholder="Mô tả tình trạng sức khỏe hiện tại của bệnh nhân, các triệu chứng, chẩn đoán..."
+                              required rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Trạng thái *</label>
+                    <select id="status" name="status" class="form-control" required>
+                        <option value="">-- Chọn trạng thái --</option>
+                        <option value="in_treatment" selected>Đang điều trị</option>
+                        <option value="discharged">Đã kết thúc điều trị</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Ghi chú thêm (nếu có)</label>
+                    <textarea id="notes" name="notes" class="form-control"
+                              placeholder="Các ghi chú khác về tình trạng bệnh nhân, hướng điều trị tiếp theo..."
+                              rows="3"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> Nhập lại
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu hồ sơ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="footer :: footer">...</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Xác nhận trước khi rời trang nếu có thay đổi
+        const form = document.querySelector('form');
+        let formChanged = false;
+
+        // Theo dõi thay đổi trong form
+        form.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('change', function() {
+                formChanged = true;
+            });
+        });
+
+        // Cảnh báo khi rời trang nếu có thay đổi chưa lưu
+        window.addEventListener('beforeunload', function(e) {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Reset cờ khi submit form
+        form.addEventListener('submit', function() {
+            formChanged = false;
+        });
+    });
+</script>
+</body>
+</html>

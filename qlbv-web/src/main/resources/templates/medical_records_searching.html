@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý hồ sơ bệnh án - Hệ thống Quản lý Bệnh viện</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/medical_records_searching.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info a {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .user-info a:hover {
+            background-color: #c0392b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <!-- Header -->
+    <div th:replace="header :: header">...</div>
+
+    <div class="container">
+        <a href="/home" class="back-link">
+            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+
+        <h1 class="page-title">Quản lý hồ sơ bệnh án</h1>
+
+        <!-- Phần tìm kiếm bệnh nhân -->
+        <div class="search-section">
+            <h2 class="section-title">
+                <i class="fas fa-search"></i> Tìm kiếm bệnh nhân
+            </h2>
+
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="patientId">ID bệnh nhân</label>
+                    <input type="text" id="patientId" name="patientId" class="form-control" placeholder="Nhập ID bệnh nhân">
+                </div>
+
+                <div class="form-group">
+                    <label for="patientName">Tên bệnh nhân</label>
+                    <input type="text" id="patientName" name="patientName" class="form-control" placeholder="Nhập tên bệnh nhân">
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Kết quả tìm kiếm -->
+        <div class="search-results" id="searchResults">
+            <h2 class="section-title">
+                <i class="fas fa-user-injured"></i> Thông tin bệnh nhân
+            </h2>
+
+            <div class="patient-info">
+                <div class="info-item">
+                    <label>ID:</label>
+                    <span id="resultId">BN001</span>
+                </div>
+                <div class="info-item">
+                    <label>Họ tên:</label>
+                    <span id="resultName">Nguyễn Văn A</span>
+                </div>
+                <div class="info-item">
+                    <label>Ngày sinh:</label>
+                    <span id="resultDob">15/05/1990</span>
+                </div>
+                <div class="info-item">
+                    <label>Giới tính:</label>
+                    <span id="resultGender">Nam</span>
+                </div>
+                <div class="info-item">
+                    <label>SĐT:</label>
+                    <span id="resultPhone">0909123456</span>
+                </div>
+                <div class="info-item">
+                    <label>Địa chỉ:</label>
+                    <span id="resultAddress">123 Đường ABC, Quận 1, TP.HCM</span>
+                </div>
+            </div>
+
+            <a href="/ho-so-benh-an/BN001" class="view-records-btn">
+                <i class="fas fa-folder-open"></i> Xem hồ sơ bệnh án
+            </a>
+        </div>
+
+        <!-- Danh sách bệnh nhân đã có hồ sơ -->
+        <div class="patients-section">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i> Bệnh nhân đã có hồ sơ
+            </h2>
+
+            <div class="patients-grid">
+                <!-- Bệnh nhân 1 -->
+                <div class="patient-card">
+                    <div class="patient-name">Nguyễn Văn A</div>
+                    <div class="patient-details">
+                        <div class="patient-detail">
+                            <label>ID:</label>
+                            <span>BN001</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Tuổi:</label>
+                            <span>33</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Giới tính:</label>
+                            <span>Nam</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Số hồ sơ:</label>
+                            <span>5</span>
+                        </div>
+                    </div>
+                    <a href="/ho-so-benh-an/BN001" class="view-records-btn">
+                        <i class="fas fa-folder-open"></i> Xem hồ sơ bệnh án
+                    </a>
+                </div>
+
+                <!-- Bệnh nhân 2 -->
+                <div class="patient-card">
+                    <div class="patient-name">Trần Thị B</div>
+                    <div class="patient-details">
+                        <div class="patient-detail">
+                            <label>ID:</label>
+                            <span>BN002</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Tuổi:</label>
+                            <span>45</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Giới tính:</label>
+                            <span>Nữ</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Số hồ sơ:</label>
+                            <span>3</span>
+                        </div>
+                    </div>
+                    <a href="/ho-so-benh-an/BN002" class="view-records-btn">
+                        <i class="fas fa-folder-open"></i> Xem hồ sơ bệnh án
+                    </a>
+                </div>
+
+                <!-- Bệnh nhân 3 -->
+                <div class="patient-card">
+                    <div class="patient-name">Lê Văn C</div>
+                    <div class="patient-details">
+                        <div class="patient-detail">
+                            <label>ID:</label>
+                            <span>BN003</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Tuổi:</label>
+                            <span>28</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Giới tính:</label>
+                            <span>Nam</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Số hồ sơ:</label>
+                            <span>7</span>
+                        </div>
+                    </div>
+                    <a href="/ho-so-benh-an/BN003" class="view-records-btn">
+                        <i class="fas fa-folder-open"></i> Xem hồ sơ bệnh án
+                    </a>
+                </div>
+
+                <!-- Bệnh nhân 4 -->
+                <div class="patient-card">
+                    <div class="patient-name">Phạm Thị D</div>
+                    <div class="patient-details">
+                        <div class="patient-detail">
+                            <label>ID:</label>
+                            <span>BN004</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Tuổi:</label>
+                            <span>60</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Giới tính:</label>
+                            <span>Nữ</span>
+                        </div>
+                        <div class="patient-detail">
+                            <label>Số hồ sơ:</label>
+                            <span>12</span>
+                        </div>
+                    </div>
+                    <a href="/ho-so-benh-an/BN004" class="view-records-btn">
+                        <i class="fas fa-folder-open"></i> Xem hồ sơ bệnh án
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div th:replace="footer :: footer">...</div>
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('searchForm');
+        const searchResults = document.getElementById('searchResults');
+
+        // Xử lý tìm kiếm
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const patientId = document.getElementById('patientId').value;
+            const patientName = document.getElementById('patientName').value;
+
+            // Kiểm tra nếu không có dữ liệu nhập vào
+            if (!patientId && !patientName) {
+                alert('Vui lòng nhập ID hoặc tên bệnh nhân để tìm kiếm');
+                return;
+            }
+
+            // Giả lập kết quả tìm kiếm (trong thực tế sẽ gọi API)
+            // Ở đây tôi giả lập dữ liệu mẫu
+            document.getElementById('resultId').textContent = patientId || 'BN001';
+            document.getElementById('resultName').textContent = patientName || 'Nguyễn Văn A';
+            document.getElementById('resultDob').textContent = '15/05/1990';
+            document.getElementById('resultGender').textContent = 'Nam';
+            document.getElementById('resultPhone').textContent = '0909123456';
+            document.getElementById('resultAddress').textContent = '123 Đường ABC, Quận 1, TP.HCM';
+
+            // Cập nhật link xem hồ sơ
+            const viewRecordsBtn = searchResults.querySelector('.view-records-btn');
+            viewRecordsBtn.href = `/ho-so-benh-an/${patientId || 'BN001'}`;
+
+            // Hiển thị kết quả
+            searchResults.classList.add('active');
+
+            // Cuộn đến kết quả
+            searchResults.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Xử lý khi click vào thẻ bệnh nhân
+        document.querySelectorAll('.patient-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Chỉ chuyển hướng nếu không click vào nút
+                if (!e.target.closest('.view-records-btn')) {
+                    const link = this.querySelector('.view-records-btn');
+                    window.location.href = link.href;
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

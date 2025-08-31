@@ -36,6 +36,26 @@ public class MedicalController {
         model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
         return "medical_records";
     }
+    @GetMapping("/searching")
+    public String medicalRecordsSearching(Model model) throws RefreshTokenException, JwtValidationException {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+//        String accessToken = loggedUser.getAccessToken();
+//        List<MedicalRecordShortDTO> medicalRecordShortDTOSDTO = medicalServiceClient.getRecordsByPatientId(accessToken);
+////        System.out.println(medicalRecordShortDTOSDTO);
+//        model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
+        return "medical_records_searching";
+    }
+    @GetMapping("/add")
+    public String addMedicalRecords(Model model) throws RefreshTokenException, JwtValidationException {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+//        String accessToken = loggedUser.getAccessToken();
+//        List<MedicalRecordShortDTO> medicalRecordShortDTOSDTO = medicalServiceClient.getRecordsByPatientId(accessToken);
+////        System.out.println(medicalRecordShortDTOSDTO);
+//        model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
+        return "medical_records_add";
+    }
     @GetMapping("/details/{id}")
     public String medicalRecordsDetails(@PathVariable("id") Integer id, Model model) throws RefreshTokenException, JwtValidationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
