@@ -1,7 +1,7 @@
 package com.doanth.medical_service.serviceClient;
 
-import com.doanth.medical_service.dto.UserInfoDTO;
 import com.doanth.medical_service.dto.LoginForm;
+import com.doanth.medical_service.dto.UserInfoDTO;
 import com.doanth.medical_service.security.ErrorDTO;
 import com.doanth.medical_service.security.JwtValidationException;
 import io.jsonwebtoken.Claims;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -79,7 +80,7 @@ public class AuthServiceClient {
         }
     }
 
-    public UserInfoDTO getUsserInfo(Integer doctorId, String accessToken) throws JwtValidationException {
+    public UserInfoDTO getUserInfo(Integer doctorId, String accessToken) throws JwtValidationException {
 //        Claims claims = validateAccessToken(AccessTokenJwt);
 //        return (DoctorInfoDTO) claims.get("doctorInfoDTO");
 //        String accessToken = login(serviceUsername, secretPassword);
@@ -101,6 +102,30 @@ public class AuthServiceClient {
                     throw new UserNotFoundException((long)doctorId);
                 }
             });
+            throw new JwtValidationException(e.getResponseBodyAs(String.class));
+        }
+    }
+
+    public List<UserInfoDTO> searchPatientInfo(Integer patientId, String patientFullName , String accessToken) throws JwtValidationException {
+//        Claims claims = validateAccessToken(AccessTokenJwt);
+//        return (DoctorInfoDTO) claims.get("doctorInfoDTO");
+//        String accessToken = login(serviceUsername, secretPassword);
+        String url =  null;
+        if(patientId == null && patientFullName != null) url = userInfoUrl + "/patient?" + "fullName=" + patientFullName;
+        else if(patientId != null && patientFullName == null) url = userInfoUrl + "/patient?" + "id=" + patientId;
+        esle if(patientId != null && patientFullName != null) url = userInfoUrl + "/patient?" + "id=" + patientId + "&fullName=" + patientFullName;
+//        String url = userInfoUrl + "/patient?" + "id=" + patientId + "&fullName=" + patientFullName;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<List<UserInfoDTO>> response = null;
+        try{
+            response= restTemplate.exchange(
+                    url, HttpMethod.GET, request, new ParameterizedTypeReference<List<UserInfoDTO>>() {}
+            );
+            return response.getBody();
+        }
+        catch(HttpClientErrorException e){
             throw new JwtValidationException(e.getResponseBodyAs(String.class));
         }
     }

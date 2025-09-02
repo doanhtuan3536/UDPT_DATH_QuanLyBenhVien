@@ -96,7 +96,7 @@
     <div th:replace="header :: header">...</div>
 
     <div class="container">
-        <a href="danh-sach-ho-so.html" class="btn btn-secondary mb-3">
+        <a th:href="@{'/medical-records/' + ${patientId}}" class="btn btn-secondary mb-3">
             <i class="fas fa-arrow-left"></i> Quay lại danh sách hồ sơ
         </a>
 

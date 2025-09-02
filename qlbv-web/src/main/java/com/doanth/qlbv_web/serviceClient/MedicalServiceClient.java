@@ -1,9 +1,6 @@
 package com.doanth.qlbv_web.serviceClient;
 
-import com.doanth.qlbv_web.dto.ErrorDTO;
-import com.doanth.qlbv_web.dto.MedicalRecordFullDTO;
-import com.doanth.qlbv_web.dto.MedicalRecordShortDTO;
-import com.doanth.qlbv_web.dto.PrescriptionDetailDTO;
+import com.doanth.qlbv_web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -22,7 +19,11 @@ public class MedicalServiceClient {
     @Autowired
     private  AuthServiceClient authServiceClient;
     private final String getRecordsByPatientIdUrl = "http://localhost:8083/api/medical/records";
+    private final String doctorGetRecordsByPatientIdUrl = "http://localhost:8083/api/medical/doctor/records";
     private final String getPrescriptionDetailsUrl = "http://localhost:8083/api/medical/prescription/details";
+    private final String getPatientsWithMedicalRecordRecentCreated = "http://localhost:8083/api/medical/records/created/recent/patients";
+    private final String getPatientsWithExaminationRecentCreated = "http://localhost:8083/api/medical/examinations/created/recent/patients";
+    private final String searchPatientsByPatientIdAndFullName = "http://localhost:8083/api/medical/patients/search";
 
     public List<MedicalRecordShortDTO> getRecordsByPatientId(String accessToken) throws RefreshTokenException, JwtValidationException {
         HttpHeaders headers = new HttpHeaders();
@@ -62,6 +63,46 @@ public class MedicalServiceClient {
             throw new JwtValidationException(e.getResponseBodyAsString());
         }
     }
+    public List<MedicalRecordShortDTO> doctorGetRecordsByPatientId(Integer patientId, String accessToken) throws RefreshTokenException, JwtValidationException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        String url = doctorGetRecordsByPatientIdUrl + "/" + patientId;
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<List<MedicalRecordShortDTO>> response = null;
+        try {
+            response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    request,
+                    new ParameterizedTypeReference<List<MedicalRecordShortDTO>>() {
+                    }
+            );
+            System.out.println(response);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+//            System.out.println("catch AppointmentServiceClient getSpecialties HttpClientErrorException");
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+            if(error.getErrors().contains("Access token expired")){
+//                System.out.println("catch AppointmentServiceClient getSpecialties if Access token expired");
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
+                response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        newRequest,
+                        new ParameterizedTypeReference<List<MedicalRecordShortDTO>>() {
+                        }
+                );
+                return response.getBody();
+
+            };
+            throw new JwtValidationException(e.getResponseBodyAsString());
+        }
+    }
+
+
     public MedicalRecordFullDTO getRecordDetailsByRecordId(String accessToken, Integer recordId) throws RefreshTokenException, JwtValidationException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -144,6 +185,134 @@ public class MedicalServiceClient {
                 return null;
             }
             throw new JwtValidationException(e.getResponseBodyAsString());
+        }
+    }
+    public List<UserDetailsFromDB> getPatientsWithMedicalRecordRecentCreated (String accessToken) throws JwtValidationException, RefreshTokenException {
+        String url = getPatientsWithMedicalRecordRecentCreated;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<List<UserDetailsFromDB>> response = null;
+        try{
+            response= restTemplate.exchange(
+                    url, HttpMethod.GET, request, new ParameterizedTypeReference<List<UserDetailsFromDB>>() {}
+            );
+            return response.getBody();
+        }
+        catch(HttpClientErrorException e){
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+
+            if(error.getErrors().contains("Access token expired")){
+//                System.out.println("catch AppointmentServiceClient getSpecialties if Access token expired");
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
+                try {
+                    response = restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            newRequest,
+                            new ParameterizedTypeReference<List<UserDetailsFromDB>>() {}
+                    );
+                    return response.getBody();
+                }
+                catch (HttpClientErrorException ex){
+                    throw new JwtValidationException(ex.getResponseBodyAs(String.class));
+                }
+
+            };
+
+            throw new JwtValidationException(e.getResponseBodyAs(String.class));
+        }
+    }
+    public List<UserDetailsFromDB> getPatientsWithExaminationRecentCreated (String accessToken) throws JwtValidationException, RefreshTokenException {
+        String url = getPatientsWithExaminationRecentCreated;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<List<UserDetailsFromDB>> response = null;
+        try{
+            response= restTemplate.exchange(
+                    url, HttpMethod.GET, request, new ParameterizedTypeReference<List<UserDetailsFromDB>>() {}
+            );
+            return response.getBody();
+        }
+        catch(HttpClientErrorException e){
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+
+            if(error.getErrors().contains("Access token expired")){
+//                System.out.println("catch AppointmentServiceClient getSpecialties if Access token expired");
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
+                try {
+                    response = restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            newRequest,
+                            new ParameterizedTypeReference<List<UserDetailsFromDB>>() {}
+                    );
+                    return response.getBody();
+                }
+                catch (HttpClientErrorException ex){
+                    throw new JwtValidationException(ex.getResponseBodyAs(String.class));
+                }
+
+            };
+
+            throw new JwtValidationException(e.getResponseBodyAs(String.class));
+        }
+    }
+    public List<UserDetailsFromDB> searchPatient (String patientId,String patientFullName,String accessToken) throws JwtValidationException, RefreshTokenException {
+        String url = searchPatientsByPatientIdAndFullName;
+        if(patientId != null && patientFullName != null){
+            if(patientId.equals("") && !patientFullName.equals("")){
+                url = url + "?fullName=" + patientFullName;
+            }
+            if (!patientId.equals("") && patientFullName.equals("")){
+                url = url + "?id=" + patientId;
+            }
+            if (!patientId.equals("") && !patientFullName.equals("")){
+                url = url + "?id=" + patientId + "&fullName=" + patientFullName;
+            }
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<List<UserDetailsFromDB>> response = null;
+        try{
+            response= restTemplate.exchange(
+                    url, HttpMethod.GET, request, new ParameterizedTypeReference<List<UserDetailsFromDB>>() {}
+            );
+            return response.getBody();
+        }
+        catch(HttpClientErrorException e){
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+
+            if(error.getErrors().contains("Access token expired")){
+//                System.out.println("catch AppointmentServiceClient getSpecialties if Access token expired");
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(newHeaders);
+                try {
+                    response = restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            newRequest,
+                            new ParameterizedTypeReference<List<UserDetailsFromDB>>() {}
+                    );
+                    return response.getBody();
+                }
+                catch (HttpClientErrorException ex){
+                    throw new JwtValidationException(ex.getResponseBodyAs(String.class));
+                }
+
+            };
+
+            throw new JwtValidationException(e.getResponseBodyAs(String.class));
         }
     }
 }

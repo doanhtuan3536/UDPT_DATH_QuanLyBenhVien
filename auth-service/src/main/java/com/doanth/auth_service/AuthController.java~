@@ -28,6 +28,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -136,8 +139,8 @@ public class AuthController {
             CustomServiceDetails customUserDetails = (CustomServiceDetails) authentication.getPrincipal();
 
             String token = tokenService.generateTokenForService(customUserDetails.getService());
-            token.setRole(customUserDetails.getAuthorities().iterator().next().getAuthority());
-            token.setHoten(customUserDetails.getUser().getHoten());
+//            token.setRole(customUserDetails.getAuthorities().iterator().next().getAuthority());
+//            token.setHoten(customUserDetails.getUser().getHoten());
             System.out.println("serviceLogin");
             System.out.println(token);
             return ResponseEntity.ok(token);
@@ -197,8 +200,26 @@ public class AuthController {
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUser(@PathVariable("id") Integer userId) {
-        User user = userService.get((long)userId);
+        User user = userService.get(userId);
         return ResponseEntity.ok(user);
+    }
+    @GetMapping("/user/patient")
+    public ResponseEntity<?> getPatientInfo(@RequestParam(value = "id", required = false, defaultValue = "0") Integer userId, @RequestParam(value = "fullName", required = false) String userFullName) {
+        List<User> users = new ArrayList<>();
+        System.out.println(userId);
+        System.out.println(userFullName);
+        if (userId == null && userFullName == null) return ResponseEntity.ok(users);
+        if(userFullName != null && !userFullName.isEmpty() && userId != null && userId > 0)
+        {
+            return ResponseEntity.ok(userService.SearchPatientByPatientFullNameAndPatientId(userFullName, userId));
+        }
+        if(userId != null && userId > 0){
+            users.addAll(userService.SearchPatientByPatientId(userId));
+        }
+        if(userFullName != null && !userFullName.isEmpty()){
+            users.addAll(userService.SearchPatientByPatientFullName(userFullName));
+        }
+        return ResponseEntity.ok(users);
     }
 
 

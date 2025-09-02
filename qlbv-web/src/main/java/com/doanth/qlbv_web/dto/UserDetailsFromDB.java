@@ -17,6 +17,33 @@ public class UserDetailsFromDB {
     private String gioitinh;
 
     private String sdt;
+    private Integer appointmentId;
+    private Integer medicalRecordId;
+    private Integer examinationId;
+
+    public Integer getExaminationId() {
+        return examinationId;
+    }
+
+    public void setExaminationId(Integer examinationId) {
+        this.examinationId = examinationId;
+    }
+
+    public Integer getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(Integer medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
+    }
+
+    public Integer getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Integer appointmentId) {
+        this.appointmentId = appointmentId;
+    }
 
     public Integer getUserId() {
         return userId;
@@ -25,6 +52,14 @@ public class UserDetailsFromDB {
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
+
+    //    public Integer getAppointmentId() {
+//        return appointmentId;
+//    }
+//
+//    public void setAppointmentId(Integer appointmentId) {
+//        this.appointmentId = appointmentId;
+//    }
 
     public String getEmail() {
         return email;
@@ -68,13 +103,16 @@ public class UserDetailsFromDB {
 
     @Override
     public String toString() {
-        return "UserDetailsFromDB{" +
-                "userId=" + userId +
+        return "UserInfoDTO{" +
+                "doctorId=" + userId +
                 ", email='" + email + '\'' +
                 ", hoten='" + hoten + '\'' +
                 ", ngaysinh=" + ngaysinh +
                 ", gioitinh='" + gioitinh + '\'' +
                 ", sdt='" + sdt + '\'' +
+                ", appointmentId=" + appointmentId +
+                ", medicalRecordId=" + medicalRecordId +
+                ", examinationId=" + examinationId +
                 '}';
     }
 }

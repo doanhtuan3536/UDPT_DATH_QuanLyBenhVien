@@ -1,12 +1,12 @@
-package com.doanth.medical_service.dto;
+package com.doanth.qlbv_web.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 
-public class UserInfoDTO {
+public class UserDetailsFromDB {
     @JsonProperty("userId")
-    private Integer doctorId;
+    private Integer userId;
 
     private String email;
 
@@ -19,6 +19,15 @@ public class UserInfoDTO {
     private String sdt;
     private Integer appointmentId;
     private Integer medicalRecordId;
+    private Integer examinationId;
+
+    public Integer getExaminationId() {
+        return examinationId;
+    }
+
+    public void setExaminationId(Integer examinationId) {
+        this.examinationId = examinationId;
+    }
 
     public Integer getMedicalRecordId() {
         return medicalRecordId;
@@ -103,6 +112,7 @@ public class UserInfoDTO {
                 ", sdt='" + sdt + '\'' +
                 ", appointmentId=" + appointmentId +
                 ", medicalRecordId=" + medicalRecordId +
+                ", examinationId=" + examinationId +
                 '}';
     }
 }

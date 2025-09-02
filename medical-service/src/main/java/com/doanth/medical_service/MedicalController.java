@@ -6,6 +6,7 @@ import com.doanth.medical_service.models.Prescription;
 import com.doanth.medical_service.models.PrescriptionDetail;
 import com.doanth.medical_service.security.JwtValidationException;
 import com.doanth.medical_service.security.User;
+import com.doanth.medical_service.service.ExaminationService;
 import com.doanth.medical_service.service.MedicalRecordService;
 import com.doanth.medical_service.service.PrescriptionService;
 import com.doanth.medical_service.serviceClient.AuthServiceClient;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,29 +32,40 @@ public class MedicalController {
     private ModelMapper modelMapper;
     private AuthServiceClient authServiceClient;
     private PrescriptionService prescriptionService;
+    private final ExaminationService examinationService;
     @Value("${service.auth.username}")
     private String serviceUsername;
 
     @Value("${service.auth.password}")
     private String secretPassword;
 
-    public MedicalController(MedicalRecordService medicalRecordService, ModelMapper modelMapper, AuthServiceClient authServiceClient, PrescriptionService prescriptionService) {
+    public MedicalController(MedicalRecordService medicalRecordService, ModelMapper modelMapper,
+                             AuthServiceClient authServiceClient, PrescriptionService prescriptionService, ExaminationService examinationService) {
         this.medicalRecordService = medicalRecordService;
         this.modelMapper = modelMapper;
         this.authServiceClient = authServiceClient;
         this.prescriptionService = prescriptionService;
+        this.examinationService = examinationService;
     }
 
     @GetMapping("/records")
-    public ResponseEntity<?> medicalRecords() throws JwtValidationException {
-//        MedicalRecord medicalRecord = medicalRecordService.getMedicalRecord(medicalRecordId);
-//        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
-//        DoctorInfoDTO doctorInfoDTO = authServiceClient.getDoctorInfo(medicalRecord.getDoctorId(), accessToken);
-//        MedicalRecordShortDTO medicalRecordShortDTO = entity2DTO(medicalRecord);
-//        medicalRecordShortDTO.setDoctorName(doctorInfoDTO.getHoten());
+    public ResponseEntity<?> patientGetMedicalRecords() throws JwtValidationException {
         Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         List<MedicalRecord> medicalRecords = medicalRecordService.listByPatientId(user.getUserId());
+        List<MedicalRecordShortDTO> medicalRecordShortDTOS = listEntity2ListDTO(medicalRecords);
+        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
+        int size = medicalRecordShortDTOS.size();
+        for (int i = 0; i < size; i++) {
+            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getUserInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
+        }
+        return ResponseEntity.ok(medicalRecordShortDTOS);
+    }
+    @GetMapping("/doctor/records/{patientId}")
+    public ResponseEntity<?> doctorGetMedicalRecordsByPatientId(@PathVariable("patientId") Integer patientId) throws JwtValidationException {
+//        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+//        User user = (User) authentication.getPrincipal();
+        List<MedicalRecord> medicalRecords = medicalRecordService.listByPatientId(patientId);
         List<MedicalRecordShortDTO> medicalRecordShortDTOS = listEntity2ListDTO(medicalRecords);
         String accessToken = authServiceClient.login(serviceUsername, secretPassword);
         int size = medicalRecordShortDTOS.size();
@@ -72,14 +86,50 @@ public class MedicalController {
                 examination.setDoctorName(authServiceClient.getUserInfo(examination.getDoctorId(), accessToken).getHoten());
             }
         }
-//        List<MedicalRecord> medicalRecords = medicalRecordService.listByPatientId(medicalRecordId);
-//        List<MedicalRecordShortDTO> medicalRecordShortDTOS = listEntity2ListDTO(medicalRecords);
-//        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
-//        int size = medicalRecordShortDTOS.size();
-//        for (int i = 0; i < size; i++) {
-//            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getDoctorInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
-//        }
         return ResponseEntity.ok(medicalRecordfullDTO);
+    }
+    @GetMapping("/records/created/recent/patients")
+    public ResponseEntity<?> getPatientsWithRecentMedicalRecordsCreatedByDoctor(@RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit) throws JwtValidationException {
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        Integer doctorId = user.getUserId();
+        List<RecentPatientsDTO> patientIds = medicalRecordService.getRecentMedicalRecordsCreatedPatientsByDoctorId(doctorId, limit);
+        String accessToken = null;
+        if(!patientIds.isEmpty()){
+            accessToken = authServiceClient.login(serviceUsername, secretPassword);
+        }
+        List<UserInfoDTO> userInfoDTOS = new ArrayList<>();
+        for (int i = 0; i < patientIds.size(); i++) {
+            userInfoDTOS.add(authServiceClient.getUserInfo(patientIds.get(i).getUserId(),accessToken));
+            userInfoDTOS.get(i).setMedicalRecordId(patientIds.get(i).getMedicalRecordId());
+        }
+        return ResponseEntity.ok(userInfoDTOS);
+    }
+    @GetMapping("/examinations/created/recent/patients")
+    public ResponseEntity<?> getPatientsWithRecentExaminationsCreatedByDoctor(@RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit) throws JwtValidationException {
+        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        Integer doctorId = user.getUserId();
+        List<RecentPatientsDTO> patientIds = examinationService.getRecentExaminationsCreatedPatientsByDoctorId(doctorId, limit);
+        String accessToken = null;
+        if(!patientIds.isEmpty()){
+            accessToken = authServiceClient.login(serviceUsername, secretPassword);
+        }
+        List<UserInfoDTO> userInfoDTOS = new ArrayList<>();
+        for (int i = 0; i < patientIds.size(); i++) {
+            userInfoDTOS.add(authServiceClient.getUserInfo(patientIds.get(i).getUserId(),accessToken));
+            userInfoDTOS.get(i).setMedicalRecordId(patientIds.get(i).getMedicalRecordId());
+            userInfoDTOS.get(i).setExaminationId(patientIds.get(i).getExaminationId());
+        }
+        return ResponseEntity.ok(userInfoDTOS);
+    }
+    @GetMapping("/patients/search")
+    public ResponseEntity<?> searchPatient(@RequestParam(value = "id", required = false) Integer patientId, @RequestParam(value = "fullName", required = false) String patientFullName) throws JwtValidationException {
+        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
+        List<UserInfoDTO> userInfoDTOS = authServiceClient.searchPatientInfo(patientId, patientFullName, accessToken);
+        System.out.println(patientId);
+        System.out.println(patientFullName);
+        return ResponseEntity.ok(userInfoDTOS);
     }
     @GetMapping("/prescription/details/{id}")
     public ResponseEntity<?> prescriptionDetails(@PathVariable("id") Integer examinationId) throws JwtValidationException {

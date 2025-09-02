@@ -2,7 +2,6 @@ package com.doanth.auth_service;
 
 
 import com.doanth.auth_service.dto.ErrorDTO;
-import com.doanth.auth_service.security.jwt.JwtValidationException;
 import com.doanth.auth_service.service.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,7 @@ import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler({UserNotFoundException.class, JwtValidationException.class})
+    @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorDTO handleJwtValidationException(HttpServletRequest request, Exception ex) {

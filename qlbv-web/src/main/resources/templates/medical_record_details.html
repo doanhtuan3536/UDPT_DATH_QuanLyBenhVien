@@ -121,7 +121,13 @@
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/home">Trang Chủ</a></li>
-                <li class="breadcrumb-item"><a href="/medical-records">Hồ Sơ Bệnh Án</a></li>
+                <li class="breadcrumb-item">
+                    <a th:href="${#authentication.principal.authResponse.role == 'bacsi'}
+                       ? '/medical-records/' + ${record.userId}
+                       : '/medical-records'">
+                        Hồ Sơ Bệnh Án
+                    </a>
+                </li>
                 <li class="breadcrumb-item active" th:text="'HSBA-' + ${record.medicalRecordId}">HSBA-2023-0015</li>
             </ol>
         </nav>

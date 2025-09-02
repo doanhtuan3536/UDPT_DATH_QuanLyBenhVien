@@ -18,6 +18,24 @@ public class UserInfoDTO {
 
     private String sdt;
     private Integer appointmentId;
+    private Integer medicalRecordId;
+    private Integer examinationId;
+
+    public Integer getExaminationId() {
+        return examinationId;
+    }
+
+    public void setExaminationId(Integer examinationId) {
+        this.examinationId = examinationId;
+    }
+
+    public Integer getMedicalRecordId() {
+        return medicalRecordId;
+    }
+
+    public void setMedicalRecordId(Integer medicalRecordId) {
+        this.medicalRecordId = medicalRecordId;
+    }
 
     public Integer getAppointmentId() {
         return appointmentId;
@@ -85,7 +103,7 @@ public class UserInfoDTO {
 
     @Override
     public String toString() {
-        return "DoctorDTO{" +
+        return "UserInfoDTO{" +
                 "doctorId=" + doctorId +
                 ", email='" + email + '\'' +
                 ", hoten='" + hoten + '\'' +
@@ -93,6 +111,8 @@ public class UserInfoDTO {
                 ", gioitinh='" + gioitinh + '\'' +
                 ", sdt='" + sdt + '\'' +
                 ", appointmentId=" + appointmentId +
+                ", medicalRecordId=" + medicalRecordId +
+                ", examinationId=" + examinationId +
                 '}';
     }
 }

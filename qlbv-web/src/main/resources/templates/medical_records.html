@@ -121,7 +121,7 @@
                         </a>
                         <!-- Nút thêm hồ sơ chỉ hiển thị cho bác sĩ -->
                         <a th:if="${#authentication.principal.authResponse.role == 'bacsi'}"
-                           th:href="@{/medical-records/add}"
+                           th:href="@{/medical-records/add(patientId=${patientId})}"
                            class="btn btn-success add-record-btn">
                             <i class="fas fa-plus me-1"></i> Thêm Hồ Sơ
                         </a>
@@ -130,7 +130,10 @@
 
                 <!-- Alert Box -->
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>Dưới đây là toàn bộ hồ sơ bệnh án của <span th:text="${#authentication.principal.authResponse.role == 'bacsi'} ? 'bệnh nhân' : 'bạn'">bạn</span> tại bệnh viện.
+                    <i class="fas fa-info-circle me-2"></i>Dưới đây là toàn bộ hồ sơ bệnh án của
+                    <span th:if="${#authentication.principal.authResponse.role == 'bacsi'}"> bệnh nhân có id: <strong th:text="${patientId}"></strong> </span>
+                    <span th:unless="${#authentication.principal.authResponse.role == 'bacsi'}">bạn</span>
+                    tại bệnh viện.
                 </div>
 
                 <!-- Check if there are medical records -->
@@ -179,11 +182,11 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    <a th:href="@{/medical-records/add}" class="btn btn-success mt-3">
-                        <i class="fas fa-plus me-1"></i> Thêm Hồ Sơ Đầu Tiên
-                    </a>
-                </div>
+<!--                <div>-->
+<!--                    <a th:href="@{/medical-records/add}" class="btn btn-success mt-3">-->
+<!--                        <i class="fas fa-plus me-1"></i> Thêm Hồ Sơ Đầu Tiên-->
+<!--                    </a>-->
+<!--                </div>-->
 
                 <!-- Empty State (shown when no records) -->
                 <div th:if="${medicalRecords == null or medicalRecords.empty}" class="text-center py-5" id="emptyState">

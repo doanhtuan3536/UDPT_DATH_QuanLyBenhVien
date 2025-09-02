@@ -1,7 +1,36 @@
 package com.doanth.medical_service.repository;
 
+import com.doanth.medical_service.dto.RecentPatientsDTO;
 import com.doanth.medical_service.models.Examination;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+@Repository
 public interface ExaminationRepo extends JpaRepository<Examination, Integer> {
+    @Query("""
+           SELECT new com.doanth.medical_service.dto.RecentPatientsDTO(
+               h.userId, e.medicalRecord.medicalRecordId, e.examinationId
+           )
+           FROM Examination e
+           JOIN e.medicalRecord h
+           WHERE e.doctorId = :doctorId
+             AND NOT EXISTS (
+                 SELECT 1 FROM Examination x
+                 WHERE x.medicalRecord.userId = h.userId
+                   AND x.doctorId = :doctorId
+                   AND (
+                        x.date > e.date
+                        OR (x.date = e.date AND x.time > e.time)
+                        OR (x.date = e.date AND x.time = e.time AND x.examinationId > e.examinationId)
+                   )
+             )
+           ORDER BY e.date DESC, e.time DESC, e.examinationId DESC
+           """)
+    List<RecentPatientsDTO> findTopRecentExaminationPatientsByDoctor(@Param("doctorId") int doctorId,
+                                                          Pageable pageable);
 }

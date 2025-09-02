@@ -3,11 +3,25 @@ package com.doanth.auth_service.repository;
 
 import com.doanth.auth_service.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
-
-public interface UserRepo extends JpaRepository<User, Long> {
+@Repository
+public interface UserRepo extends JpaRepository<User, Integer> {
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+
+    @Query("SELECT u FROM User u WHERE u.loai = 'benhnhan' AND u.status = 'active' AND u.userId = ?1")
+    List<User> findPatientByPatientId(Integer patientId);
+
+    @Query("SELECT u FROM User u WHERE u.loai = 'benhnhan' AND u.status = 'active' AND u.hoten LIKE ?1")
+    List<User> findPatientByPatientFullName(String patientFullName);
+
+    @Query("SELECT u FROM User u WHERE u.loai = 'benhnhan' AND u.status = 'active' " +
+            "AND (COALESCE(:patientFullName, '') = '' OR u.hoten LIKE %:patientFullName%) " +
+            "AND (:patientId IS NULL OR u.userId = :patientId)")
+    List<User> findPatientByPatientFullNameAndPatientId(String patientFullName, Integer patientId);
 }

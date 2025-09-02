@@ -111,7 +111,6 @@ public class MedicalController {
 //        List<MedicalRecordShortDTO> medicalRecordShortDTOSDTO = medicalServiceClient.getRecordsByPatientId(accessToken);
 ////        System.out.println(medicalRecordShortDTOSDTO);
 //        model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
-        model.addAttribute("patientId", patientId);
         return "medical_records_add";
     }
     @GetMapping("/details/{id}")

@@ -96,7 +96,7 @@
     <div th:replace="header :: header">...</div>
 
     <div class="container">
-        <a href="danh-sach-ho-so.html" class="btn btn-secondary mb-3">
+        <a href="/medical-records" class="btn btn-secondary mb-3">
             <i class="fas fa-arrow-left"></i> Quay lại danh sách hồ sơ
         </a>
 
@@ -150,12 +150,12 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="notes">Ghi chú thêm (nếu có)</label>
-                    <textarea id="notes" name="notes" class="form-control"
-                              placeholder="Các ghi chú khác về tình trạng bệnh nhân, hướng điều trị tiếp theo..."
-                              rows="3"></textarea>
-                </div>
+<!--                <div class="form-group">-->
+<!--                    <label for="notes">Ghi chú thêm (nếu có)</label>-->
+<!--                    <textarea id="notes" name="notes" class="form-control"-->
+<!--                              placeholder="Các ghi chú khác về tình trạng bệnh nhân, hướng điều trị tiếp theo..."-->
+<!--                              rows="3"></textarea>-->
+<!--                </div>-->
 
                 <div class="d-flex justify-content-between">
                     <button type="reset" class="btn btn-secondary">

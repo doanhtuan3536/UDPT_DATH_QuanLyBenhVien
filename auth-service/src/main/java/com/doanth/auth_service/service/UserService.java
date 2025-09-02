@@ -5,6 +5,8 @@ import com.doanth.auth_service.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
     @Autowired
@@ -22,13 +24,25 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User get(Long userId) {
+    public User get(Integer userId) {
         User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
-            throw new UserNotFoundException(userId);
+            throw new UserNotFoundException((long)userId);
         }
 
         return user;
+    }
+
+    public List<User> SearchPatientByPatientId(Integer patientId) {
+        return userRepository.findPatientByPatientId(patientId);
+    }
+
+    public List<User> SearchPatientByPatientFullName(String patientFullName) {
+        return userRepository.findPatientByPatientFullName(patientFullName);
+    }
+
+    public List<User> SearchPatientByPatientFullNameAndPatientId(String patientFullName, Integer patientId) {
+        return userRepository.findPatientByPatientFullNameAndPatientId(patientFullName, patientId);
     }
 }

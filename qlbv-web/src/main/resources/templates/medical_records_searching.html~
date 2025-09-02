@@ -216,7 +216,7 @@
                             <span th:text="${patient.examinationId}">2</span>
                         </div>
                     </div>
-                    <a th:href="@{'/medical-records/' + ${patient.userId}}" class="view-records-btn">
+                    <a th:href="@{'/ho-so-benh-an/' + ${patient.userId}}" class="view-records-btn">
                         <i class="fas fa-folder-open"></i> Xem hồ sơ bệnh án
                     </a>
                 </div>
