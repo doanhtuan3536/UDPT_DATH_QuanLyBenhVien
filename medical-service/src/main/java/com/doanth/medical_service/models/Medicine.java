@@ -16,7 +16,7 @@ public class Medicine {
     private String medicineName;
 
     @Column(name = "soluong", nullable = false)
-    private Integer stockQuantity; // Số lượng thuốc còn trong kho
+    private Integer stockQuantity;
 
     @Column(name = "giaban", nullable = false)
     private Double price;
@@ -31,6 +31,14 @@ public class Medicine {
 
     @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PrescriptionDetail> prescriptionDetails;
+
+    public MedicineCategory getMedicineCategory() {
+        return medicineCategory;
+    }
+
+    public void setMedicineCategory(MedicineCategory medicineCategory) {
+        this.medicineCategory = medicineCategory;
+    }
 
     // Constructors
     public Medicine() {}

@@ -20,6 +20,9 @@ public class MedicalRecordService {
     public MedicalRecord getMedicalRecord(int medicalRecordId) {
         return medicalRecordRepo.findById(medicalRecordId).orElseThrow(() -> new MedicalRecordNotFoundException("Medical record not found"));
     }
+    public MedicalRecord add(MedicalRecord medicalRecord) {
+        return medicalRecordRepo.save(medicalRecord);
+    }
 
     public List<MedicalRecord> listByPatientId(int patientId) {
         List<MedicalRecord> medicalRecords = medicalRecordRepo.findByPatientId(patientId);

@@ -112,19 +112,19 @@
             }
         }
         .btn-light {
-            background-color: #f8f9fa;
-            border-color: #f8f9fa;
-            color: #0dcaf0;
-            font-weight: 500;
-        }
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    color: #0dcaf0;
+    font-weight: 500;
+}
 
-        .btn-light:hover {
-            background-color: #e9ecef;
-            border-color: #e9ecef;
-            color: #0dcaf0;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+.btn-light:hover {
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+    color: #0dcaf0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
     </style>
 </head>
 <body class="bg-light">

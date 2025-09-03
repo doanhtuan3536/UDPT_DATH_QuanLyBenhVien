@@ -3,10 +3,7 @@ package com.doanth.qlbv_web.serviceClient;
 import com.doanth.qlbv_web.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -19,11 +16,51 @@ public class MedicalServiceClient {
     @Autowired
     private  AuthServiceClient authServiceClient;
     private final String getRecordsByPatientIdUrl = "http://localhost:8083/api/medical/records";
+    private final String addMedicalRecordUrl = "http://localhost:8083/api/medical/records/add";
     private final String doctorGetRecordsByPatientIdUrl = "http://localhost:8083/api/medical/doctor/records";
     private final String getPrescriptionDetailsUrl = "http://localhost:8083/api/medical/prescription/details";
     private final String getPatientsWithMedicalRecordRecentCreated = "http://localhost:8083/api/medical/records/created/recent/patients";
     private final String getPatientsWithExaminationRecentCreated = "http://localhost:8083/api/medical/examinations/created/recent/patients";
     private final String searchPatientsByPatientIdAndFullName = "http://localhost:8083/api/medical/patients/search";
+
+    public MedicalRecordAddForm addMedicalRecord(String accessToken, MedicalRecordAddForm form) throws RefreshTokenException, JwtValidationException {// URL của Auth Service
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Bearer " + accessToken);
+        HttpEntity<MedicalRecordAddForm> request = new HttpEntity<>(form, headers);
+        System.out.println(request);
+        ResponseEntity<MedicalRecordAddForm> response = null;
+
+        try {
+            response = restTemplate.exchange(
+                    addMedicalRecordUrl,
+                    HttpMethod.POST,
+                    request,
+                    MedicalRecordAddForm.class
+            );
+            System.out.println(response);
+            return response.getBody();
+        } catch (HttpClientErrorException e) {
+            ErrorDTO error = e.getResponseBodyAs(ErrorDTO.class);
+            if(error.getErrors().contains("Access token expired")){
+                AuthResponse authResponse = authServiceClient.handleAccessTokenExpired();
+                HttpHeaders newHeaders = new HttpHeaders();
+                newHeaders.setContentType(MediaType.APPLICATION_JSON);
+                newHeaders.add("Authorization", "Bearer " + authResponse.getAccessToken());
+                HttpEntity<?> newRequest = new HttpEntity<>(form,newHeaders);
+                response = restTemplate.exchange(
+                        addMedicalRecordUrl,
+                        HttpMethod.POST,
+                        newRequest,
+                        MedicalRecordAddForm.class
+                );
+                return response.getBody();
+
+            };
+            throw new JwtValidationException(e.getResponseBodyAsString());
+        }
+    }
 
     public List<MedicalRecordShortDTO> getRecordsByPatientId(String accessToken) throws RefreshTokenException, JwtValidationException {
         HttpHeaders headers = new HttpHeaders();

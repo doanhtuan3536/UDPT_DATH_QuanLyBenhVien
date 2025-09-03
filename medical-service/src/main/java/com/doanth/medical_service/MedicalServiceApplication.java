@@ -1,5 +1,9 @@
 package com.doanth.medical_service;
 
+import com.doanth.medical_service.dto.MedicalRecordAddDTO;
+import com.doanth.medical_service.dto.MedicineInfoDTO;
+import com.doanth.medical_service.models.MedicalRecord;
+import com.doanth.medical_service.models.Medicine;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +21,13 @@ public class MedicalServiceApplication {
 	public ModelMapper getModelMapper() {
 		ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-
+		mapper.typeMap(MedicalRecordAddDTO.class, MedicalRecord.class)
+				.addMapping(MedicalRecordAddDTO::getPatientId, MedicalRecord::setUserId);
+		mapper.typeMap(MedicalRecord.class, MedicalRecordAddDTO.class)
+				.addMapping(MedicalRecord::getUserId, MedicalRecordAddDTO::setPatientId);
+		mapper.typeMap(Medicine.class, MedicineInfoDTO.class)
+				.addMapping((medicine) -> medicine.getMedicineCategory().getMedicineCategoryId(), MedicineInfoDTO::setMedicineCategoryId)
+				.addMapping((medicine) -> medicine.getMedicineCategory().getMedicineCategoryName(), MedicineInfoDTO::setMedicineCategoryName);
 		return mapper;
 	}
 

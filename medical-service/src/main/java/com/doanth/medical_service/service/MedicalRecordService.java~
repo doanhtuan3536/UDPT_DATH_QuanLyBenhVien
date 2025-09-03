@@ -1,5 +1,6 @@
 package com.doanth.medical_service.service;
 
+import com.doanth.medical_service.dto.RecentPatientsDTO;
 import com.doanth.medical_service.models.MedicalRecord;
 import com.doanth.medical_service.repository.MedicalRecordRepo;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,7 @@ public class MedicalRecordService {
         return medicalRecords;
     }
 
-    public List<Integer> getRecentMedicalRecordsCreatedPatientsByDoctorId(int doctorId, int limit) {
+    public List<RecentPatientsDTO> getRecentMedicalRecordsCreatedPatientsByDoctorId(int doctorId, int limit) {
         Pageable pageable = PageRequest.of(0, limit);
         return medicalRecordRepo.findRecentPatientsByDoctor(doctorId, pageable);
     }

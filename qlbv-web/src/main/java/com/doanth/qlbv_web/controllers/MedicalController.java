@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,12 @@ public class MedicalController {
     public MedicalController(MedicalServiceClient medicalServiceClient) {
         this.medicalServiceClient = medicalServiceClient;
     }
+
+    @GetMapping("/examinations/add")
+    public String addExamination(Model model) {
+        return "examination_add";
+    }
+
     @GetMapping
     public String medicalRecords(Model model) throws RefreshTokenException, JwtValidationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -111,9 +118,41 @@ public class MedicalController {
 //        List<MedicalRecordShortDTO> medicalRecordShortDTOSDTO = medicalServiceClient.getRecordsByPatientId(accessToken);
 ////        System.out.println(medicalRecordShortDTOSDTO);
 //        model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
+
+        if(!model.containsAttribute("medicalRecordForm"))
+        {
+            MedicalRecordAddForm medicalRecordAddForm = new MedicalRecordAddForm();
+            medicalRecordAddForm.setPatientId(patientId);
+            model.addAttribute("medicalRecordForm", medicalRecordAddForm);
+
+        }
         model.addAttribute("patientId", patientId);
+
+
+
         return "medical_records_add";
     }
+    @PostMapping("/add")
+    public String handleAddMedicalRecords(@ModelAttribute("medicalRecordForm") MedicalRecordAddForm form, RedirectAttributes redirectAttributes, Model model) throws RefreshTokenException, JwtValidationException {
+        redirectAttributes.addFlashAttribute("medicalRecordForm", form);
+        System.out.println(form);
+        if(form.getDischargeSummary().trim().equals("") || form.getHealthCondition().trim().equals("")) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Vui lòng nhập đầy đủ thông tin");
+
+//            redirectAttributes.addAttribute("patientId", form.getPatientId());
+            return "redirect:/medical-records/add?patientId=" + form.getPatientId();
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails loggedUser = (UserDetails) auth.getPrincipal();
+        form.setDoctorId(loggedUser.getAuthResponse().getUserId());
+        form.setCreatedAt(LocalDateTime.now());
+        medicalServiceClient.addMedicalRecord(loggedUser.getAuthResponse().getAccessToken(), form);
+        redirectAttributes.addFlashAttribute("successfulMsg", "Tạo hồ sơ bệnh án mới cho bệnh nhân có id: " + form.getPatientId() + " thành công.");
+//        System.out.println(form);
+        return "redirect:/medical-records/add?patientId=" + form.getPatientId();
+    }
+
+
     @GetMapping("/details/{id}")
     public String medicalRecordsDetails(@PathVariable("id") Integer id, Model model) throws RefreshTokenException, JwtValidationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Lịch Sử Khám Bệnh</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .medicine-item {
+            border-left: 4px solid #0d6efd;
+            padding-left: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .medicine-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        .hidden-section {
+            display: none;
+        }
+        .category-filter {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .pagination {
+            margin-bottom: 0;
+        }
+        .selected-medicine {
+            background-color: #e9f5ff;
+            border-left: 4px solid #0d6efd;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h2 class="text-center mb-4">Thêm Lịch Sử Khám Bệnh</h2>
+
+            <!-- Form thông tin khám bệnh -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Thông tin buổi khám</h5>
+                </div>
+                <div class="card-body">
+                    <form id="examinationForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày khám</label>
+                                <input type="date" class="form-control" id="examinationDate" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Giờ khám</label>
+                                <input type="time" class="form-control" id="examinationTime" readonly>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Triệu chứng chủ quan</label>
+                            <textarea class="form-control" rows="3" placeholder="Mô tả triệu chứng từ bệnh nhân" id="subjectiveSymptom"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Triệu chứng khách quan</label>
+                            <textarea class="form-control" rows="3" placeholder="Mô tả triệu chứng qua thăm khám" id="objectiveSymptom"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Chẩn đoán</label>
+                            <textarea class="form-control" rows="3" placeholder="Chẩn đoán bệnh" id="diagnosis"></textarea>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Phần đơn thuốc (ban đầu ẩn) -->
+            <div class="card mb-4 hidden-section" id="prescriptionSection">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Đơn thuốc</h5>
+                    <div>
+                        <span class="status-badge bg-warning text-dark me-2">Chưa sẵn sàng</span>
+                        <button class="btn btn-sm btn-outline-danger" id="cancelPrescriptionBtn">
+                            <i class="fas fa-times me-1"></i>Hủy
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Bộ lọc danh mục thuốc -->
+                    <div class="category-filter">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Danh mục thuốc</label>
+                                <select class="form-select" id="medicineCategory">
+                                    <option value="">Tất cả danh mục</option>
+                                    <!-- Danh mục sẽ được tải từ API -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tìm kiếm thuốc</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Nhập tên thuốc..." id="medicineSearch">
+                                    <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách thuốc -->
+                    <div class="mb-4">
+                        <h6>Danh sách thuốc</h6>
+                        <div class="list-group mb-3" id="medicineList">
+                            <div class="text-center py-3">
+                                <div class="loading-spinner me-2"></div> Đang tải danh sách thuốc...
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Medicine pagination">
+                            <ul class="pagination justify-content-center" id="medicinePagination">
+                                <!-- Pagination sẽ được tạo bằng JavaScript -->
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- Thuốc đã chọn -->
+                    <div>
+                        <h6>Thuốc đã thêm vào đơn</h6>
+                        <div id="selectedMedicines">
+                            <p class="text-muted fst-italic">Chưa có thuốc nào được thêm vào đơn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút thêm đơn thuốc -->
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-secondary" id="backButton">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                </button>
+                <div>
+                    <button class="btn btn-outline-primary me-2" id="addPrescriptionBtn">
+                        <i class="fas fa-pills me-2"></i>Thêm đơn thuốc
+                    </button>
+                    <button class="btn btn-primary" id="saveExaminationBtn">
+                        <i class="fas fa-save me-2"></i>Lưu lịch sử khám
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Base URL cho API
+    const API_BASE_URL = 'http://localhost:8083/api/medical';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Hiển thị ngày và giờ hiện tại
+        const now = new Date();
+        document.getElementById('examinationDate').value = now.toISOString().split('T')[0];
+        document.getElementById('examinationTime').value = now.toTimeString().substring(0, 5);
+
+        // Biến toàn cục
+        let currentPage = 1;
+        const medicinesPerPage = 5;
+        let allMedicines = [];
+        let filteredMedicines = [];
+        let selectedMedicinesList = [];
+        let medicineCategories = [];
+
+        // Khởi tạo ứng dụng
+        initializeApp();
+
+        // Xử lý nút thêm đơn thuốc
+        const addPrescriptionBtn = document.getElementById('addPrescriptionBtn');
+        const cancelPrescriptionBtn = document.getElementById('cancelPrescriptionBtn');
+        const prescriptionSection = document.getElementById('prescriptionSection');
+
+        addPrescriptionBtn.addEventListener('click', function() {
+            prescriptionSection.classList.remove('hidden-section');
+            addPrescriptionBtn.disabled = true;
+            addPrescriptionBtn.classList.add('disabled');
+        });
+
+        cancelPrescriptionBtn.addEventListener('click', function() {
+            prescriptionSection.classList.add('hidden-section');
+            addPrescriptionBtn.disabled = false;
+            addPrescriptionBtn.classList.remove('disabled');
+
+            // Reset danh sách thuốc đã chọn
+            selectedMedicinesList = [];
+            updateSelectedMedicinesDisplay();
+        });
+
+        // Khởi tạo ứng dụng
+        async function initializeApp() {
+            try {
+                // Tải danh mục thuốc
+                await loadMedicineCategories();
+
+                // Tải tất cả thuốc
+                await loadAllMedicines();
+
+            } catch (error) {
+                console.error('Lỗi khi khởi tạo ứng dụng:', error);
+                alert('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.');
+            }
+        }
+
+        // Tải danh mục thuốc từ API
+        async function loadMedicineCategories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/medicines/categories`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                medicineCategories = await response.json();
+                populateCategoryDropdown();
+            } catch (error) {
+                console.error('Lỗi khi tải danh mục thuốc:', error);
+                document.getElementById('medicineCategory').innerHTML = '<option value="">Lỗi khi tải danh mục</option>';
+            }
+        }
+
+        // Điền danh mục vào dropdown
+        function populateCategoryDropdown() {
+            const categoryDropdown = document.getElementById('medicineCategory');
+            categoryDropdown.innerHTML = '<option value="">Tất cả danh mục</option>';
+
+            medicineCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.medicineCategoryId;
+                option.textContent = category.medicineCategoryName;
+                categoryDropdown.appendChild(option);
+            });
+        }
+
+        // Tải tất cả thuốc từ API
+        async function loadAllMedicines() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/medicines`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allMedicines = await response.json();
+                filteredMedicines = [...allMedicines];
+                displayMedicines(filteredMedicines, currentPage);
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách thuốc:', error);
+                document.getElementById('medicineList').innerHTML =
+                    '<div class="text-center text-danger py-3">Lỗi khi tải danh sách thuốc. Vui lòng thử lại sau.</div>';
+            }
+        }
+
+        // Tải thuốc theo danh mục từ API
+        async function loadMedicinesByCategory(categoryId) {
+            try {
+                let url = `${API_BASE_URL}/medicines`;
+                if (categoryId) {
+                    url += `?categoryId=${categoryId}`;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allMedicines = await response.json();
+                filteredMedicines = [...allMedicines];
+                currentPage = 1;
+                displayMedicines(filteredMedicines, currentPage);
+            } catch (error) {
+                console.error('Lỗi khi tải danh sách thuốc theo danh mục:', error);
+                document.getElementById('medicineList').innerHTML =
+                    '<div class="text-center text-danger py-3">Lỗi khi tải danh sách thuốc. Vui lòng thử lại sau.</div>';
+            }
+        }
+
+        // Hiển thị danh sách thuốc với pagination
+        function displayMedicines(medicinesToShow, page) {
+            const medicineList = document.getElementById('medicineList');
+
+            const startIndex = (page - 1) * medicinesPerPage;
+            const endIndex = startIndex + medicinesPerPage;
+            const paginatedMedicines = medicinesToShow.slice(startIndex, endIndex);
+
+            if (paginatedMedicines.length === 0) {
+                medicineList.innerHTML = '<p class="text-muted text-center">Không tìm thấy thuốc nào</p>';
+                displayPagination(0, page);
+                return;
+            }
+
+            medicineList.innerHTML = '';
+
+            paginatedMedicines.forEach(medicine => {
+                const medicineItem = document.createElement('div');
+                medicineItem.className = 'list-group-item medicine-item';
+                medicineItem.setAttribute('data-id', medicine.medicineId);
+
+                // Kiểm tra xem thuốc đã được chọn chưa
+                const isSelected = selectedMedicinesList.some(item => item.medicineId === medicine.medicineId);
+                if (isSelected) {
+                    medicineItem.classList.add('selected-medicine');
+                }
+
+                medicineItem.innerHTML = `
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${medicine.medicineName}</h6>
+                        ${isSelected ? '<span class="badge bg-success">Đã thêm</span>' : ''}
+                    </div>
+                    <p class="mb-1">${medicine.description}</p>
+                    <small>Danh mục: ${medicine.medicineCategoryName}</small>
+                    <div class="mt-1">
+                        <small class="text-muted">Tồn kho: ${medicine.stockQuantity}</small>
+                    </div>
+                `;
+
+                medicineItem.addEventListener('click', function() {
+                    if (!isSelected) {
+                        addMedicineToPrescription(medicine);
+                    } else {
+                        removeMedicineFromPrescription(medicine.medicineId);
+                    }
+                });
+
+                medicineList.appendChild(medicineItem);
+            });
+
+            // Hiển thị pagination
+            displayPagination(medicinesToShow.length, page);
+        }
+
+        // Hiển thị phân trang
+        function displayPagination(totalMedicines, currentPage) {
+            const totalPages = Math.ceil(totalMedicines / medicinesPerPage);
+            const paginationElement = document.getElementById('medicinePagination');
+            paginationElement.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Nút Previous
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#">Trước</a>`;
+            prevLi.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    changePage(currentPage - 1);
+                }
+            });
+            paginationElement.appendChild(prevLi);
+
+            // Các nút trang
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLi = document.createElement('li');
+                pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                pageLi.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                pageLi.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    changePage(i);
+                });
+                paginationElement.appendChild(pageLi);
+            }
+
+            // Nút Next
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#">Sau</a>`;
+            nextLi.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    changePage(currentPage + 1);
+                }
+            });
+            paginationElement.appendChild(nextLi);
+        }
+
+        // Chuyển trang
+        function changePage(page) {
+            currentPage = page;
+            displayMedicines(filteredMedicines, currentPage);
+        }
+
+        // Xử lý tìm kiếm thuốc
+        const medicineSearch = document.getElementById('medicineSearch');
+        const searchButton = document.getElementById('searchButton');
+
+        function filterMedicines() {
+            const searchText = medicineSearch.value.toLowerCase();
+
+            filteredMedicines = allMedicines.filter(medicine => {
+                return medicine.medicineName.toLowerCase().includes(searchText) ||
+                       medicine.description.toLowerCase().includes(searchText);
+            });
+
+            currentPage = 1;
+            displayMedicines(filteredMedicines, currentPage);
+        }
+
+        medicineSearch.addEventListener('input', filterMedicines);
+        searchButton.addEventListener('click', filterMedicines);
+
+        // Xử lý lọc theo danh mục
+        const medicineCategory = document.getElementById('medicineCategory');
+        medicineCategory.addEventListener('change', function() {
+            const categoryId = this.value;
+            if (categoryId) {
+                loadMedicinesByCategory(categoryId);
+            } else {
+                loadAllMedicines();
+            }
+        });
+
+        // Thêm thuốc vào đơn
+        function addMedicineToPrescription(medicine) {
+            // Kiểm tra xem thuốc đã được thêm chưa
+            if (selectedMedicinesList.some(item => item.medicineId === medicine.medicineId)) {
+                alert('Thuốc này đã được thêm vào đơn!');
+                return;
+            }
+
+            // Kiểm tra tồn kho
+            if (medicine.stockQuantity <= 0) {
+                alert('Thuốc này đã hết hàng trong kho!');
+                return;
+            }
+
+            // Thêm thuốc vào danh sách với số lượng mặc định là 1
+            selectedMedicinesList.push({
+                ...medicine,
+                quantity: 1
+            });
+
+            updateSelectedMedicinesDisplay();
+            displayMedicines(filteredMedicines, currentPage); // Cập nhật hiển thị danh sách thuốc
+        }
+
+        // Xóa thuốc khỏi đơn
+        function removeMedicineFromPrescription(medicineId) {
+            selectedMedicinesList = selectedMedicinesList.filter(item => item.medicineId !== medicineId);
+            updateSelectedMedicinesDisplay();
+            displayMedicines(filteredMedicines, currentPage); // Cập nhật hiển thị danh sách thuốc
+        }
+
+        // Cập nhật hiển thị thuốc đã chọn
+        function updateSelectedMedicinesDisplay() {
+            const selectedMedicinesContainer = document.getElementById('selectedMedicines');
+
+            if (selectedMedicinesList.length === 0) {
+                selectedMedicinesContainer.innerHTML = '<p class="text-muted fst-italic">Chưa có thuốc nào được thêm vào đơn</p>';
+                return;
+            }
+
+            selectedMedicinesContainer.innerHTML = '';
+
+            selectedMedicinesList.forEach(medicine => {
+                const selectedMedicine = document.createElement('div');
+                selectedMedicine.className = 'card mb-2 selected-medicine';
+                selectedMedicine.setAttribute('data-selected-id', medicine.medicineId);
+                selectedMedicine.innerHTML = `
+                    <div class="card-body py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">${medicine.medicineName}</h6>
+                                <small class="text-muted">${medicine.description}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="input-group input-group-sm me-2" style="width: 120px;">
+                                    <span class="input-group-text">Số lượng</span>
+                                    <input type="number" class="form-control" value="${medicine.quantity}" min="1" max="${medicine.stockQuantity}" data-medicine-id="${medicine.medicineId}">
+                                </div>
+                                <button class="btn btn-sm btn-danger remove-medicine" data-medicine-id="${medicine.medicineId}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Thêm sự kiện thay đổi số lượng
+                const quantityInput = selectedMedicine.querySelector('input');
+                quantityInput.addEventListener('change', function() {
+                    const newQuantity = parseInt(this.value);
+                    const medicineId = parseInt(this.getAttribute('data-medicine-id'));
+                    const medicineIndex = selectedMedicinesList.findIndex(item => item.medicineId === medicineId);
+
+                    if (newQuantity > 0 && newQuantity <= medicine.stockQuantity) {
+                        if (medicineIndex !== -1) {
+                            selectedMedicinesList[medicineIndex].quantity = newQuantity;
+                        }
+                    } else {
+                        this.value = Math.max(1, Math.min(newQuantity, medicine.stockQuantity));
+                        if (medicineIndex !== -1) {
+                            selectedMedicinesList[medicineIndex].quantity = parseInt(this.value);
+                        }
+                    }
+                });
+
+                // Thêm sự kiện xóa thuốc
+                const removeBtn = selectedMedicine.querySelector('.remove-medicine');
+                removeBtn.addEventListener('click', function() {
+                    const medicineId = parseInt(this.getAttribute('data-medicine-id'));
+                    removeMedicineFromPrescription(medicineId);
+                });
+
+                selectedMedicinesContainer.appendChild(selectedMedicine);
+            });
+        }
+
+        // Xử lý lưu lịch sử khám
+        const saveExaminationBtn = document.getElementById('saveExaminationBtn');
+
+        saveExaminationBtn.addEventListener('click', async function() {
+            // Lấy dữ liệu từ form
+            const examinationData = {
+                examinationDate: document.getElementById('examinationDate').value,
+                examinationTime: document.getElementById('examinationTime').value,
+                subjectiveSymptom: document.getElementById('subjectiveSymptom').value,
+                objectiveSymptom: document.getElementById('objectiveSymptom').value,
+                diagnosis: document.getElementById('diagnosis').value,
+                prescription: selectedMedicinesList
+            };
+
+            // Kiểm tra dữ liệu
+            if (!examinationData.subjectiveSymptom || !examinationData.objectiveSymptom || !examinationData.diagnosis) {
+                alert('Vui lòng điền đầy đủ thông tin khám bệnh!');
+                return;
+            }
+
+            // Kiểm tra xem có đơn thuốc không
+            const hasPrescription = !prescriptionSection.classList.contains('hidden-section');
+
+            if (hasPrescription && selectedMedicinesList.length === 0) {
+                if (!confirm('Bạn chưa thêm thuốc nào vào đơn. Bạn có chắc chắn muốn lưu không?')) {
+                    return;
+                }
+            }
+
+            try {
+                // Ở đây sẽ là code để gửi dữ liệu đến API lưu lịch sử khám
+                // Ví dụ:
+                // const response = await fetch('http://localhost:8083/api/medical/examinations', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify(examinationData)
+                // });
+
+                // if (!response.ok) {
+                //     throw new Error('Lỗi khi lưu lịch sử khám');
+                // }
+
+                // Giả lập lưu thành công
+                alert('Lịch sử khám đã được lưu thành công!');
+
+                // Reset form sau khi lưu
+                document.getElementById('examinationForm').reset();
+                prescriptionSection.classList.add('hidden-section');
+                addPrescriptionBtn.disabled = false;
+                addPrescriptionBtn.classList.remove('disabled');
+                selectedMedicinesList = [];
+                updateSelectedMedicinesDisplay();
+
+            } catch (error) {
+                console.error('Lỗi khi lưu lịch sử khám:', error);
+                alert('Có lỗi xảy ra khi lưu lịch sử khám. Vui lòng thử lại sau.');
+            }
+        });
+
+        // Xử lý nút quay lại
+        document.getElementById('backButton').addEventListener('click', function() {
+            if (confirm('Bạn có chắc chắn muốn quay lại? Dữ liệu chưa lưu sẽ bị mất.')) {
+                window.history.back();
+            }
+        });
+    });
+</script>
+</body>
+</html>

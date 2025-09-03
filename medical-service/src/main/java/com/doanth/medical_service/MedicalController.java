@@ -2,12 +2,14 @@ package com.doanth.medical_service;
 
 import com.doanth.medical_service.dto.*;
 import com.doanth.medical_service.models.MedicalRecord;
+import com.doanth.medical_service.models.Medicine;
 import com.doanth.medical_service.models.Prescription;
 import com.doanth.medical_service.models.PrescriptionDetail;
 import com.doanth.medical_service.security.JwtValidationException;
 import com.doanth.medical_service.security.User;
 import com.doanth.medical_service.service.ExaminationService;
 import com.doanth.medical_service.service.MedicalRecordService;
+import com.doanth.medical_service.service.MedicineService;
 import com.doanth.medical_service.service.PrescriptionService;
 import com.doanth.medical_service.serviceClient.AuthServiceClient;
 import org.modelmapper.ModelMapper;
@@ -16,10 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,7 @@ public class MedicalController {
     private AuthServiceClient authServiceClient;
     private PrescriptionService prescriptionService;
     private final ExaminationService examinationService;
+    private final MedicineService medicineService;
     @Value("${service.auth.username}")
     private String serviceUsername;
 
@@ -40,12 +40,48 @@ public class MedicalController {
     private String secretPassword;
 
     public MedicalController(MedicalRecordService medicalRecordService, ModelMapper modelMapper,
-                             AuthServiceClient authServiceClient, PrescriptionService prescriptionService, ExaminationService examinationService) {
+                             AuthServiceClient authServiceClient, PrescriptionService prescriptionService,
+                             ExaminationService examinationService, MedicineService medicineService) {
         this.medicalRecordService = medicalRecordService;
         this.modelMapper = modelMapper;
         this.authServiceClient = authServiceClient;
         this.prescriptionService = prescriptionService;
         this.examinationService = examinationService;
+        this.medicineService = medicineService;
+    }
+
+    @GetMapping("/medicines/categories")
+    public ResponseEntity<?> GetMedicineCategories() {
+//        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+//        User user = (User) authentication.getPrincipal();
+//        List<MedicalRecord> medicalRecords = medicalRecordService.listByPatientId(user.getUserId());
+//        List<MedicalRecordShortDTO> medicalRecordShortDTOS = listEntity2ListDTO(medicalRecords);
+//        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
+//        int size = medicalRecordShortDTOS.size();
+//        for (int i = 0; i < size; i++) {
+//            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getUserInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
+//        }
+        return ResponseEntity.ok(medicineService.getAllMedicineCategories());
+    }
+
+    @GetMapping("/medicines")
+    public ResponseEntity<?> GetMedicines(@RequestParam(value = "categoryId", required = false) Integer categoryId) {
+        if(categoryId != null) {
+            return ResponseEntity.ok(medicineService.getMedicinesByCategoryId(categoryId));
+        }
+
+        List<Medicine> medicines = medicineService.getAllMedicines();
+        List<MedicineInfoDTO> medicineInfoDTOS = medicines.stream().map(medicine -> modelMapper.map(medicine, MedicineInfoDTO.class)).collect(Collectors.toList());
+//        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
+//        User user = (User) authentication.getPrincipal();
+//        List<MedicalRecord> medicalRecords = medicalRecordService.listByPatientId(user.getUserId());
+//        List<MedicalRecordShortDTO> medicalRecordShortDTOS = listEntity2ListDTO(medicalRecords);
+//        String accessToken = authServiceClient.login(serviceUsername, secretPassword);
+//        int size = medicalRecordShortDTOS.size();
+//        for (int i = 0; i < size; i++) {
+//            medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getUserInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
+//        }
+        return ResponseEntity.ok(medicineInfoDTOS);
     }
 
     @GetMapping("/records")
@@ -60,6 +96,16 @@ public class MedicalController {
             medicalRecordShortDTOS.get(i).setDoctorName(authServiceClient.getUserInfo(medicalRecordShortDTOS.get(i).getDoctorId(), accessToken).getHoten());
         }
         return ResponseEntity.ok(medicalRecordShortDTOS);
+    }
+    @PostMapping("/records/add")
+    public ResponseEntity<?> addMedicalRecord(@RequestBody MedicalRecordAddDTO medicalRecord) throws JwtValidationException {
+
+        MedicalRecord medicalRecordToSave = modelMapper.map(medicalRecord, MedicalRecord.class);
+
+        MedicalRecord savedMedicalRecord = medicalRecordService.add(medicalRecordToSave);
+
+        MedicalRecordAddDTO medicalRecordAddDTO = modelMapper.map(savedMedicalRecord, MedicalRecordAddDTO.class);
+        return ResponseEntity.ok(medicalRecordAddDTO);
     }
     @GetMapping("/doctor/records/{patientId}")
     public ResponseEntity<?> doctorGetMedicalRecordsByPatientId(@PathVariable("patientId") Integer patientId) throws JwtValidationException {

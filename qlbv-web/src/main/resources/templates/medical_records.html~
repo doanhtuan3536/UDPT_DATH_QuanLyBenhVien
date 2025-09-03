@@ -131,8 +131,8 @@
                 <!-- Alert Box -->
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>Dưới đây là toàn bộ hồ sơ bệnh án của
-<!--                    <span th:if="${#authentication.principal.authResponse.role == 'bacsi'}"> bệnh nhân có id: <strong th:text="${patientId}"></strong> </span>-->
-<!--                    <span th:unless="${#authentication.principal.authResponse.role == 'bacsi'}">bạn</span>-->
+                    <span th:if="${#authentication.principal.authResponse.role == 'bacsi'}"> bệnh nhân có id: <strong th:text="${patientId}"></strong> </span>
+                    <span th:unless="${#authentication.principal.authResponse.role == 'bacsi'}">bạn</span>
                     tại bệnh viện.
                 </div>
 

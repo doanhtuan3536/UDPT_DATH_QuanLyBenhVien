@@ -126,25 +126,27 @@
 
         <!-- Form thêm hồ sơ bệnh án -->
         <div class="form-container">
-            <form action="#" method="post">
+            <form th:action="@{/medical-records/add}" method="post" th:object="${medicalRecordForm}">
+                <div th:if="${errorMsg}" class="alert alert-danger text-center" th:text="${errorMsg}"></div>
+                <div th:if="${successfulMsg}" class="alert alert-success text-center" th:text="${successfulMsg}"></div>
                 <div class="form-group">
                     <label for="treatmentSummary">Tóm tắt quá trình điều trị *</label>
-                    <textarea id="treatmentSummary" name="treatmentSummary" class="form-control"
+                    <textarea id="treatmentSummary" name="dischargeSummary" class="form-control"
                               placeholder="Mô tả chi tiết quá trình điều trị, phương pháp đã áp dụng, thuốc đã sử dụng..."
-                              required rows="5"></textarea>
+                              required rows="5" th:field="*{dischargeSummary}"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="healthCondition">Tình trạng sức khỏe *</label>
                     <textarea id="healthCondition" name="healthCondition" class="form-control"
                               placeholder="Mô tả tình trạng sức khỏe hiện tại của bệnh nhân, các triệu chứng, chẩn đoán..."
-                              required rows="4"></textarea>
+                              required rows="4" th:field="*{healthCondition}"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="status">Trạng thái *</label>
-                    <select id="status" name="status" class="form-control" required>
-                        <option value="">-- Chọn trạng thái --</option>
+                    <select id="status" name="status" class="form-control" required th:field="*{status}">
+                        <option value="in_treatment">-- Chọn trạng thái --</option>
                         <option value="in_treatment" selected>Đang điều trị</option>
                         <option value="discharged">Đã kết thúc điều trị</option>
                     </select>
@@ -156,6 +158,7 @@
 <!--                              placeholder="Các ghi chú khác về tình trạng bệnh nhân, hướng điều trị tiếp theo..."-->
 <!--                              rows="3"></textarea>-->
 <!--                </div>-->
+                <input type="hidden" name="patientId" th:value="${patientId}" th:field="*{patientId}">
 
                 <div class="d-flex justify-content-between">
                     <button type="reset" class="btn btn-secondary">
