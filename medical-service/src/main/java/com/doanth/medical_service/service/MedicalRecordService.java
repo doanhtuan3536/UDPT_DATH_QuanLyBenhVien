@@ -34,4 +34,13 @@ public class MedicalRecordService {
         Pageable pageable = PageRequest.of(0, limit);
         return medicalRecordRepo.findRecentPatientsByDoctor(doctorId, pageable);
     }
+
+    public MedicalRecord updateStatus(int medicalRecordId, String status) {
+        MedicalRecord record = medicalRecordRepo.findById(medicalRecordId).orElseThrow(() -> new MedicalRecordNotFoundException("Medical record not found"));
+
+        record.setStatus(status);
+
+
+        return medicalRecordRepo.save(record);
+    }
 }

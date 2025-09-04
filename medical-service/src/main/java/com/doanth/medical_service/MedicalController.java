@@ -95,6 +95,13 @@ public class MedicalController {
         }
         return ResponseEntity.ok(medicalRecordShortDTOS);
     }
+    @PutMapping("/records/discharge/{medicalRecordId}")
+    public ResponseEntity<?> dischargeMedicalRecords(@PathVariable("medicalRecordId") Integer medicalRecordId) throws JwtValidationException {
+        MedicalRecord discharged = medicalRecordService.updateStatus(medicalRecordId, "discharged");
+        MedicalRecordShortDTO medicalRecordShortDTO = modelMapper.map(discharged, MedicalRecordShortDTO.class);
+        return ResponseEntity.ok(medicalRecordShortDTO);
+    }
+
     @PostMapping("/records/add")
     public ResponseEntity<?> addMedicalRecord(@RequestBody MedicalRecordAddDTO medicalRecord) throws JwtValidationException {
 
@@ -110,34 +117,37 @@ public class MedicalController {
 
         Examination examinationToSave = modelMapper.map(examination, Examination.class);
         Examination savedExamination = examinationService.addExamination(examinationToSave);
+        Prescription prescription = null;
+        if (examination.getMedicineInPrescriptions() != null) {
+            prescription = new Prescription();
+            PrescriptionId prescriptionId = new PrescriptionId();
+            prescription.setPrescriptionId(prescriptionId);
+            prescription.getPrescriptionId().setExaminationId(savedExamination.getExaminationId());
+            prescription.getPrescriptionId().setPatientId(examination.getPatientId());
+            prescription.setExamination(savedExamination);
+            prescription.setStatus("Chưa sẵn sàng");
+            prescription.setCreatedAt(LocalDateTime.of(savedExamination.getDate(), savedExamination.getTime()));
+            double totalPrice = 0;
+            prescription.setPrescriptionDetails(new ArrayList<>());
 
-        Prescription prescription = new Prescription();
-        PrescriptionId prescriptionId = new PrescriptionId();
-        prescription.setPrescriptionId(prescriptionId);
-        prescription.getPrescriptionId().setExaminationId(savedExamination.getExaminationId());
-        prescription.getPrescriptionId().setPatientId(examination.getPatientId());
-        prescription.setExamination(savedExamination);
-        prescription.setStatus("Chưa sẵn sàng");
-        prescription.setCreatedAt(LocalDateTime.of(savedExamination.getDate(), savedExamination.getTime()));
-        double totalPrice = 0;
-        prescription.setPrescriptionDetails(new ArrayList<>());
-        for (MedicineInPrescriptionDTO medicine : examination.getMedicineInPrescriptions()) {
-            PrescriptionDetail prescriptionDetail = new PrescriptionDetail();
-            prescriptionDetail.setPrecriptionDetailId(new PrecriptionDetailId());
-            prescriptionDetail.getPrecriptionDetailId().setPrescriptionId(prescription.getPrescriptionId());
-            prescriptionDetail.getPrecriptionDetailId().setMedicineId(medicine.getMedicineId());
-            double medicinePrice = medicineService.getMedicinePrice(medicine.getMedicineId());
-            totalPrice += medicinePrice * medicine.getQuantity();
-            prescriptionDetail.setQuantity((int) medicine.getQuantity());
-            Medicine medicine1 = new Medicine();
-            medicine1.setMedicineId(medicine.getMedicineId());
-            prescriptionDetail.setMedicine(medicine1);
-            prescriptionDetail.setPrescription(prescription);
-            prescription.getPrescriptionDetails().add(prescriptionDetail);
+
+            for (MedicineInPrescriptionDTO medicine : examination.getMedicineInPrescriptions()) {
+                PrescriptionDetail prescriptionDetail = new PrescriptionDetail();
+                prescriptionDetail.setPrecriptionDetailId(new PrecriptionDetailId());
+                prescriptionDetail.getPrecriptionDetailId().setPrescriptionId(prescription.getPrescriptionId());
+                prescriptionDetail.getPrecriptionDetailId().setMedicineId(medicine.getMedicineId());
+                double medicinePrice = medicineService.getMedicinePrice(medicine.getMedicineId());
+                totalPrice += medicinePrice * medicine.getQuantity();
+                prescriptionDetail.setQuantity((int) medicine.getQuantity());
+                Medicine medicine1 = new Medicine();
+                medicine1.setMedicineId(medicine.getMedicineId());
+                prescriptionDetail.setMedicine(medicine1);
+                prescriptionDetail.setPrescription(prescription);
+                prescription.getPrescriptionDetails().add(prescriptionDetail);
+            }
+            prescription.setTotalPrice(totalPrice);
+            prescriptionService.addPrescription(prescription);
         }
-        prescription.setTotalPrice(totalPrice);
-        prescriptionService.addPrescription(prescription);
-
         return ResponseEntity.ok(savedExamination.getExaminationId());
     }
     @GetMapping("/doctor/records/{patientId}")

@@ -39,6 +39,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/medical/examinations/add")
                                 .hasAnyAuthority("bacsi")
+                                .requestMatchers(HttpMethod.PUT,"/api/medical/records/discharge/*")
+                                .hasAnyAuthority("bacsi", "nhanvien")
 //                        .requestMatchers(HttpMethod.POST,"/api/appointments")
 //                                .hasAnyAuthority("benhnhan", "nhanvien")
 //                                .requestMatchers(HttpMethod.GET,"/api/appointments")

@@ -219,6 +219,15 @@ public class MedicalController {
         return "medical_record_details";
     }
 
+    @GetMapping("/discharge/{medicalRecordId}")
+    public String dischargerMedicalRecord(@PathVariable("medicalRecordId") Integer medicalRecordId, Model model) throws RefreshTokenException, JwtValidationException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+        String accessToken = loggedUser.getAccessToken();
+        MedicalRecordShortDTO medicalRecordShortDTO = medicalServiceClient.dischargeMedicalRecord(accessToken, medicalRecordId);
+        return "redirect:/medical-records/details/" + medicalRecordId;
+    }
+
     @GetMapping("/prescriptions/{examinationId}/{medicalRecordId}")
     public String prescriptions(@PathVariable("examinationId") Integer examinationId, @PathVariable("medicalRecordId") Integer medicalRecordId, @RequestParam(value = "patientId", required = false) Integer patientId ,Model model) throws RefreshTokenException, JwtValidationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -227,14 +236,15 @@ public class MedicalController {
         if(patientId != null){
             PrescriptionDetailDTO prescriptionDetailDTO = medicalServiceClient.getPrescriptionDetailWithExamIdAndPatientId(accessToken, examinationId, patientId);
             model.addAttribute("prescription", prescriptionDetailDTO);
-            // Thêm prescriptionId vào model để sử dụng trong breadcrumb
             model.addAttribute("medicalRecordId", medicalRecordId);
             model.addAttribute("examinationId", examinationId);
+            model.addAttribute("patientId", patientId);
             return "prescription_details";
         }
 //        MedicalRecordFullDTO medicalRecordFullDTO = medicalServiceClient.getRecordDetailsByRecordId(accessToken, id);
         PrescriptionDetailDTO prescriptionDetailDTO = medicalServiceClient.getPrescriptionDetail(accessToken, examinationId);
         System.out.println(prescriptionDetailDTO);
+        model.addAttribute("patientId", loggedUser.getUserId());
         model.addAttribute("prescription", prescriptionDetailDTO);
         // Thêm prescriptionId vào model để sử dụng trong breadcrumb
         model.addAttribute("medicalRecordId", medicalRecordId);
