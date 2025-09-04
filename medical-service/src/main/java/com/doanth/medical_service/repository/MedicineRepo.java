@@ -11,4 +11,7 @@ import java.util.List;
 public interface MedicineRepo extends JpaRepository<Medicine, Integer> {
     @Query("SELECT m FROM Medicine m WHERE m.medicineCategory.medicineCategoryId = ?1")
     List<Medicine> findByCategoryId(Integer categoryId);
+
+    @Query("SELECT m.price FROM Medicine m WHERE m.medicineId = ?1")
+    Double getPriceByMedicineId(Integer medicineId);
 }

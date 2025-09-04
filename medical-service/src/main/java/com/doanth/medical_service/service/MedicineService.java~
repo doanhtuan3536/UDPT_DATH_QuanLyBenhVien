@@ -38,4 +38,11 @@ public class MedicineService {
         }
         return medicineInfoDTOS;
     }
+
+    public List<Medicine> getAllMedicines() {
+        return medicineRepo.findAll();
+    }
+    public double getMedicinePrice(int medicineId) {
+        return medicineRepo.getMedicinePrice(medicineId);
+    }
 }

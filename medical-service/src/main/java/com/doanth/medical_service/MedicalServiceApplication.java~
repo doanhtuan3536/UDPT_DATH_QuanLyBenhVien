@@ -1,9 +1,7 @@
 package com.doanth.medical_service;
 
-import com.doanth.medical_service.dto.ExaminationInfoAddDTO;
 import com.doanth.medical_service.dto.MedicalRecordAddDTO;
 import com.doanth.medical_service.dto.MedicineInfoDTO;
-import com.doanth.medical_service.models.Examination;
 import com.doanth.medical_service.models.MedicalRecord;
 import com.doanth.medical_service.models.Medicine;
 import org.modelmapper.Converter;
@@ -39,9 +37,9 @@ public class MedicalServiceApplication {
 			return s;
 		};
 
-		mapper.typeMap(ExaminationInfoAddDTO.class, Examination.class)
+		mapper.typeMap(AppointmentInfoDTO.class, Appointment.class)
 				.addMappings(m -> m.using(specialtyConverter)
-						.map(ExaminationInfoAddDTO::getMedicalRecordId, Examination::setMedicalRecord));
+						.map(AppointmentInfoDTO::getSpecialtyId, Appointment::setSpecialty));
 
 		return mapper;
 	}

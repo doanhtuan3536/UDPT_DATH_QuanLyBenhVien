@@ -1,0 +1,19 @@
+package com.doanth.qlbv_web.dto;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+public class ExaminationInfoAddDTO {
+    private int examinationId;
+    private int medicalRecordId;
+    private int doctorId;
+    private int patientId;
+    private LocalDate date;
+    private LocalTime time;
+    private String subjective_note;
+    private String objective_note;
+    private String assessment_note;
+
+    List<MedicineInPrescriptionDTO> medicineInPrescriptions;
+}

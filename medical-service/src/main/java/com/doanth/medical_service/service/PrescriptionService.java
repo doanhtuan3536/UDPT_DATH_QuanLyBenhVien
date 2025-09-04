@@ -35,4 +35,7 @@ public class PrescriptionService {
 
         return prescription;
     }
+    public Prescription addPrescription(Prescription prescription) {
+        return prescriptionRepo.save(prescription);
+    }
 }

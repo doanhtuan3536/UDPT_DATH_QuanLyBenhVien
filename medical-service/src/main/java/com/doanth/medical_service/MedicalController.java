@@ -1,10 +1,7 @@
 package com.doanth.medical_service;
 
 import com.doanth.medical_service.dto.*;
-import com.doanth.medical_service.models.MedicalRecord;
-import com.doanth.medical_service.models.Medicine;
-import com.doanth.medical_service.models.Prescription;
-import com.doanth.medical_service.models.PrescriptionDetail;
+import com.doanth.medical_service.models.*;
 import com.doanth.medical_service.security.JwtValidationException;
 import com.doanth.medical_service.security.User;
 import com.doanth.medical_service.service.ExaminationService;
@@ -20,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -107,6 +105,41 @@ public class MedicalController {
         MedicalRecordAddDTO medicalRecordAddDTO = modelMapper.map(savedMedicalRecord, MedicalRecordAddDTO.class);
         return ResponseEntity.ok(medicalRecordAddDTO);
     }
+    @PostMapping("/examinations/add")
+    public ResponseEntity<?> addExamination(@RequestBody ExaminationInfoAddDTO examination) throws JwtValidationException {
+
+        Examination examinationToSave = modelMapper.map(examination, Examination.class);
+        Examination savedExamination = examinationService.addExamination(examinationToSave);
+
+        Prescription prescription = new Prescription();
+        PrescriptionId prescriptionId = new PrescriptionId();
+        prescription.setPrescriptionId(prescriptionId);
+        prescription.getPrescriptionId().setExaminationId(savedExamination.getExaminationId());
+        prescription.getPrescriptionId().setPatientId(examination.getPatientId());
+        prescription.setExamination(savedExamination);
+        prescription.setStatus("Chưa sẵn sàng");
+        prescription.setCreatedAt(LocalDateTime.of(savedExamination.getDate(), savedExamination.getTime()));
+        double totalPrice = 0;
+        prescription.setPrescriptionDetails(new ArrayList<>());
+        for (MedicineInPrescriptionDTO medicine : examination.getMedicineInPrescriptions()) {
+            PrescriptionDetail prescriptionDetail = new PrescriptionDetail();
+            prescriptionDetail.setPrecriptionDetailId(new PrecriptionDetailId());
+            prescriptionDetail.getPrecriptionDetailId().setPrescriptionId(prescription.getPrescriptionId());
+            prescriptionDetail.getPrecriptionDetailId().setMedicineId(medicine.getMedicineId());
+            double medicinePrice = medicineService.getMedicinePrice(medicine.getMedicineId());
+            totalPrice += medicinePrice * medicine.getQuantity();
+            prescriptionDetail.setQuantity((int) medicine.getQuantity());
+            Medicine medicine1 = new Medicine();
+            medicine1.setMedicineId(medicine.getMedicineId());
+            prescriptionDetail.setMedicine(medicine1);
+            prescriptionDetail.setPrescription(prescription);
+            prescription.getPrescriptionDetails().add(prescriptionDetail);
+        }
+        prescription.setTotalPrice(totalPrice);
+        prescriptionService.addPrescription(prescription);
+
+        return ResponseEntity.ok(savedExamination.getExaminationId());
+    }
     @GetMapping("/doctor/records/{patientId}")
     public ResponseEntity<?> doctorGetMedicalRecordsByPatientId(@PathVariable("patientId") Integer patientId) throws JwtValidationException {
 //        Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
@@ -178,10 +211,16 @@ public class MedicalController {
         return ResponseEntity.ok(userInfoDTOS);
     }
     @GetMapping("/prescription/details/{id}")
-    public ResponseEntity<?> prescriptionDetails(@PathVariable("id") Integer examinationId) throws JwtValidationException {
+    public ResponseEntity<?> prescriptionDetails(@PathVariable("id") Integer examinationId, @RequestParam(value = "patientId", required = false) Integer patientIdParam) throws JwtValidationException {
         Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
-        int patientId = user.getUserId();
+        int patientId = 0;
+        if(patientIdParam != null){
+            patientId = patientIdParam;
+        }
+        else{
+            patientId = user.getUserId();
+        }
         int examId = examinationId;
         Prescription prescription = prescriptionService.getPrescription(patientId, examId);
         List<PrescriptionDetail> prescriptionDetail = prescription.getPrescriptionDetails();

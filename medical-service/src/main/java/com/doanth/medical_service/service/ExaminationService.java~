@@ -1,6 +1,7 @@
 package com.doanth.medical_service.service;
 
 import com.doanth.medical_service.dto.RecentPatientsDTO;
+import com.doanth.medical_service.models.Examination;
 import com.doanth.medical_service.repository.ExaminationRepo;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +17,17 @@ public class ExaminationService {
         this.examinationRepo = examinationRepo;
     }
 
-    public List<RecentPatientsDTO> getTopRecentPatients(int doctorId, int limit) {
+    public List<RecentPatientsDTO> getRecentExaminationsCreatedPatientsByDoctorId(int doctorId, int limit) {
         Pageable pageable = PageRequest.of(0, limit);
         return examinationRepo.findTopRecentExaminationPatientsByDoctorId(doctorId, pageable);
+    }
+
+    public Examination addExamination(Examination examination) {
+        return examinationRepo.save(examination);
+    }
+
+    public double getMedicinePrice(int medicineId) {
+        return examinationRepo.getMedicinePrice(medicineId);
     }
 
 

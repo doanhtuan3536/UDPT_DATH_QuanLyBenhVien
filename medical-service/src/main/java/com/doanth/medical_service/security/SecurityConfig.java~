@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/medical/medicines")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/medical/examinations/add")
+                                .requestMatchers(HttpMethod.GET,"/api/medical/examinations/add")
                                 .hasAnyAuthority("bacsi")
 //                        .requestMatchers(HttpMethod.POST,"/api/appointments")
 //                                .hasAnyAuthority("benhnhan", "nhanvien")

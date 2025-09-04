@@ -42,4 +42,7 @@ public class MedicineService {
     public List<Medicine> getAllMedicines() {
         return medicineRepo.findAll();
     }
+    public double getMedicinePrice(int medicineId) {
+        return medicineRepo.getPriceByMedicineId(medicineId);
+    }
 }

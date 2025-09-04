@@ -26,8 +26,63 @@ public class MedicalController {
     }
 
     @GetMapping("/examinations/add")
-    public String addExamination(Model model) {
+    public String addExamination(@RequestParam(value = "medicalRecordId", required = false) Integer medicalRecordId,
+            @RequestParam(value = "patientId", required = false) Integer patientId,Model model) {
+        if (!model.containsAttribute("patientId")) {
+            model.addAttribute("patientId", patientId);
+        }
+        if (!model.containsAttribute("medicalRecordId")) {
+            model.addAttribute("medicalRecordId", medicalRecordId);
+        }
+
         return "examination_add";
+    }
+
+    @PostMapping("/examinations/add")
+    public String handleAddExamination(@ModelAttribute("examinationForm") ExaminationInfoAddDTO form, @RequestParam(value = "medicalRecordId", required = false) Integer medicalRecordId,
+                                       Model model, RedirectAttributes redirectAttributes) throws RefreshTokenException, JwtValidationException {
+//        if (!model.containsAttribute("patientId")) {
+//            model.addAttribute("patientId", patientId);
+//        }
+//        if (!model.containsAttribute("medicalRecordId")) {
+//            model.addAttribute("medicalRecordId", medicalRecordId);
+//        }
+        System.out.println("Examination data received:");
+        System.out.println("Medical Record ID: " + form.getMedicalRecordId());
+        System.out.println("Patient ID: " + form.getPatientId());
+        System.out.println("Doctor ID: " + form.getDoctorId());
+        System.out.println("Date: " + form.getDate());
+        System.out.println("Time: " + form.getTime());
+        System.out.println("Subjective note: " + form.getSubjective_note());
+        System.out.println("Objective note: " + form.getObjective_note());
+        System.out.println("Assessment note: " + form.getAssessment_note());
+
+        // In ra thông tin đơn thuốc nếu có
+        if (form.getMedicineInPrescriptions() != null) {
+            System.out.println("Prescription medicines:");
+            for (MedicineInPrescriptionDTO medicine : form.getMedicineInPrescriptions()) {
+                System.out.println("Medicine ID: " + medicine.getMedicineId() + ", Quantity: " + medicine.getQuantity());
+            }
+        } else {
+            System.out.println("No prescription medicines");
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
+        String accessToken = loggedUser.getAccessToken();
+
+        medicalServiceClient.addExamination(accessToken,form);
+
+        // Ở đây bạn có thể thêm logic để lưu dữ liệu vào database
+
+        redirectAttributes.addAttribute("medicalRecordId", medicalRecordId);
+        redirectAttributes.addAttribute("patientId", form.getPatientId());
+        redirectAttributes.addFlashAttribute("successfulMsg", "Tạo lịch sử khám thành công.");
+
+
+
+
+        return "redirect:/medical-records/examinations/add";
     }
 
     @GetMapping
@@ -165,10 +220,18 @@ public class MedicalController {
     }
 
     @GetMapping("/prescriptions/{examinationId}/{medicalRecordId}")
-    public String prescriptions(@PathVariable("examinationId") Integer examinationId, @PathVariable("medicalRecordId") Integer medicalRecordId, Model model) throws RefreshTokenException, JwtValidationException {
+    public String prescriptions(@PathVariable("examinationId") Integer examinationId, @PathVariable("medicalRecordId") Integer medicalRecordId, @RequestParam(value = "patientId", required = false) Integer patientId ,Model model) throws RefreshTokenException, JwtValidationException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
         String accessToken = loggedUser.getAccessToken();
+        if(patientId != null){
+            PrescriptionDetailDTO prescriptionDetailDTO = medicalServiceClient.getPrescriptionDetailWithExamIdAndPatientId(accessToken, examinationId, patientId);
+            model.addAttribute("prescription", prescriptionDetailDTO);
+            // Thêm prescriptionId vào model để sử dụng trong breadcrumb
+            model.addAttribute("medicalRecordId", medicalRecordId);
+            model.addAttribute("examinationId", examinationId);
+            return "prescription_details";
+        }
 //        MedicalRecordFullDTO medicalRecordFullDTO = medicalServiceClient.getRecordDetailsByRecordId(accessToken, id);
         PrescriptionDetailDTO prescriptionDetailDTO = medicalServiceClient.getPrescriptionDetail(accessToken, examinationId);
         System.out.println(prescriptionDetailDTO);

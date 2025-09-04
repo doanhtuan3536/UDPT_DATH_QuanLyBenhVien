@@ -112,19 +112,19 @@
             }
         }
         .btn-light {
-    background-color: #f8f9fa;
-    border-color: #f8f9fa;
-    color: #0dcaf0;
-    font-weight: 500;
-}
+            background-color: #f8f9fa;
+            border-color: #f8f9fa;
+            color: #0dcaf0;
+            font-weight: 500;
+        }
 
-.btn-light:hover {
-    background-color: #e9ecef;
-    border-color: #e9ecef;
-    color: #0dcaf0;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+        .btn-light:hover {
+            background-color: #e9ecef;
+            border-color: #e9ecef;
+            color: #0dcaf0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -235,10 +235,17 @@
 <!--                                            </a>-->
 <!--                                        </div>-->
                                         <div class="mt-2">
-                                            <a th:href="@{'/medical-records/prescriptions/' + ${exam.examinationId} + '/' + ${record.medicalRecordId}}"
-                                               class="btn btn-outline-success btn-sm">
+<!--                                            <a th:href="@{'/medical-records/prescriptions/' + ${exam.examinationId} + '/' + ${record.medicalRecordId}}"-->
+<!--                                               class="btn btn-outline-success btn-sm">-->
+<!--                                                <i class="fas fa-prescription me-1"></i> Xem đơn thuốc của lịch khám # <span th:text="${exam.examinationId}">1</span>-->
+<!--                                            </a>-->
+
+                                            <a th:href="${#authentication.principal.authResponse.role == 'bacsi'}
+                                                       ? '/medical-records/prescriptions/' + ${exam.examinationId} + '/' + ${record.medicalRecordId} + '?patientId=' + ${record.userId}
+                                                       : '/medical-records/prescriptions/' + ${exam.examinationId} + '/' + ${record.medicalRecordId}" class="btn btn-outline-success btn-sm">
                                                 <i class="fas fa-prescription me-1"></i> Xem đơn thuốc của lịch khám # <span th:text="${exam.examinationId}">1</span>
                                             </a>
+
                                         </div>
                                         <div th:attr="id='examDetail' + ${iterStat.index}" class="collapse">
                                             <div class="mt-3">
