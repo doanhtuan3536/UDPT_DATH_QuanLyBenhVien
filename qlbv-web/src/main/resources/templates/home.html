@@ -106,6 +106,13 @@
                 <a href="/appointments/add" class="card-btn">Đặt lịch ngay</a>
             </div>
 
+            <div class="card appointment" sec:authorize="isAuthenticated() and (#authentication.principal.authResponse.role == 'nhanvien')">
+                <div class="card-icon">📅</div>
+                <h2>Quản lý đơn thuốc</h2>
+                <p>Xem danh sách đơn thuốc và chuẩn bị đơn thuốc</p>
+                <a href="/medical-records/prescriptions/management" class="card-btn">Xem danh sách</a>
+            </div>
+
             <div class="card appointment" sec:authorize="!isAuthenticated()">
                 <div class="card-icon">📅</div>
                 <h2>Đặt lịch khám</h2>
@@ -113,14 +120,14 @@
                 <a href="/appointments/no-auth/add" class="card-btn">Đặt lịch ngay</a>
             </div>
 
-            <div class="card history" sec:authorize="isAuthenticated()">
+            <div class="card history" sec:authorize="isAuthenticated() and !(#authentication.principal.authResponse.role == 'nhanvien')">
                 <div class="card-icon">📋</div>
                 <h2 th:text="${#authentication.principal.authResponse.role == 'benhnhan'} ? 'Lịch sử đặt khám' : 'Lịch bệnh nhân đặt khám'"></h2>
                 <p>Xem lại các lịch khám đã đặt và trạng thái của chúng (đã xác nhận/chưa xác nhận)</p>
                 <a href="/appointments" class="card-btn">Xem lịch sử</a>
             </div>
 
-            <div class="card PatientRecord" sec:authorize="isAuthenticated()">
+            <div class="card PatientRecord" sec:authorize="isAuthenticated() and !(#authentication.principal.authResponse.role == 'nhanvien')">
                 <div class="card-icon">📁</div>
                 <h2>Hồ sơ bệnh án</h2>
                 <p>Xem lại các hồ sơ bệnh án</p>

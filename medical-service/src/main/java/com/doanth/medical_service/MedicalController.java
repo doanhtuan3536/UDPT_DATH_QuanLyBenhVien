@@ -261,6 +261,12 @@ public class MedicalController {
         return ResponseEntity.ok(prescriptionDetailDTO);
     }
 
+//    @GetMapping("/prescription/details/{id}")
+//    public ResponseEntity<?> getAllPrescription(@PathVariable("id") Integer examinationId, @RequestParam(value = "patientId", required = false) Integer patientIdParam) throws JwtValidationException {
+//
+//        return ResponseEntity.ok("OK");
+//    }
+
     private MedicalRecordShortDTO entity2DTO(MedicalRecord entity) {
         return modelMapper.map(entity, MedicalRecordShortDTO.class);
     }

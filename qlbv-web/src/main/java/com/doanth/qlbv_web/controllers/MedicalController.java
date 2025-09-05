@@ -251,4 +251,9 @@ public class MedicalController {
         model.addAttribute("examinationId", examinationId);
         return "prescription_details";
     }
+    @GetMapping("/prescriptions/management")
+    public String managePrescriptions(){
+
+        return "prescription_management";
+    }
 }

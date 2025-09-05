@@ -99,7 +99,7 @@ public class MedicalController {
     public ResponseEntity<?> dischargeMedicalRecords(@PathVariable("medicalRecordId") Integer medicalRecordId) throws JwtValidationException {
         MedicalRecord discharged = medicalRecordService.updateStatus(medicalRecordId, "discharged");
         MedicalRecordShortDTO medicalRecordShortDTO = modelMapper.map(discharged, MedicalRecordShortDTO.class);
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.ok(medicalRecordShortDTO);
     }
 
     @PostMapping("/records/add")
@@ -259,6 +259,12 @@ public class MedicalController {
         }
         prescriptionDetailDTO.setTotalPrice(totalPrice);
         return ResponseEntity.ok(prescriptionDetailDTO);
+    }
+
+    @GetMapping("/prescription/details/{id}")
+    public ResponseEntity<?> getAllPrescription(@PathVariable("id") Integer examinationId, @RequestParam(value = "patientId", required = false) Integer patientIdParam) throws JwtValidationException {
+
+        return ResponseEntity.ok("OK");
     }
 
     private MedicalRecordShortDTO entity2DTO(MedicalRecord entity) {
