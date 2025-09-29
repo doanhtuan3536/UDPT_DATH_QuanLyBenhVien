@@ -1,0 +1,17 @@
+package com.doanlt.notification_service.rabbitmq;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class TestController {
+    @Value("${spring.mail.username}")
+    public String email;
+
+    @GetMapping("/email")
+    public String getEmail() {
+        return email;
+    }
+
+}

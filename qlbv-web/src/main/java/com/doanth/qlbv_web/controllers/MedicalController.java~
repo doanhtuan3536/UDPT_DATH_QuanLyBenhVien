@@ -41,31 +41,7 @@ public class MedicalController {
     @PostMapping("/examinations/add")
     public String handleAddExamination(@ModelAttribute("examinationForm") ExaminationInfoAddDTO form, @RequestParam(value = "medicalRecordId", required = false) Integer medicalRecordId,
                                        Model model, RedirectAttributes redirectAttributes) throws RefreshTokenException, JwtValidationException {
-//        if (!model.containsAttribute("patientId")) {
-//            model.addAttribute("patientId", patientId);
-//        }
-//        if (!model.containsAttribute("medicalRecordId")) {
-//            model.addAttribute("medicalRecordId", medicalRecordId);
-//        }
-        System.out.println("Examination data received:");
-        System.out.println("Medical Record ID: " + form.getMedicalRecordId());
-        System.out.println("Patient ID: " + form.getPatientId());
-        System.out.println("Doctor ID: " + form.getDoctorId());
-        System.out.println("Date: " + form.getDate());
-        System.out.println("Time: " + form.getTime());
-        System.out.println("Subjective note: " + form.getSubjective_note());
-        System.out.println("Objective note: " + form.getObjective_note());
-        System.out.println("Assessment note: " + form.getAssessment_note());
 
-        // In ra thông tin đơn thuốc nếu có
-        if (form.getMedicineInPrescriptions() != null) {
-            System.out.println("Prescription medicines:");
-            for (MedicineInPrescriptionDTO medicine : form.getMedicineInPrescriptions()) {
-                System.out.println("Medicine ID: " + medicine.getMedicineId() + ", Quantity: " + medicine.getQuantity());
-            }
-        } else {
-            System.out.println("No prescription medicines");
-        }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
@@ -78,10 +54,7 @@ public class MedicalController {
         redirectAttributes.addAttribute("medicalRecordId", medicalRecordId);
         redirectAttributes.addAttribute("patientId", form.getPatientId());
         redirectAttributes.addFlashAttribute("successfulMsg", "Tạo lịch sử khám thành công.");
-
-
-
-
+        
         return "redirect:/medical-records/examinations/add";
     }
 
@@ -167,13 +140,6 @@ public class MedicalController {
     }
     @GetMapping("/add")
     public String addMedicalRecords(Model model, @RequestParam(value = "patientId", required = false) Integer patientId) throws RefreshTokenException, JwtValidationException {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        AuthResponse loggedUser = ((UserDetails) auth.getPrincipal()).getAuthResponse();
-//        String accessToken = loggedUser.getAccessToken();
-//        List<MedicalRecordShortDTO> medicalRecordShortDTOSDTO = medicalServiceClient.getRecordsByPatientId(accessToken);
-////        System.out.println(medicalRecordShortDTOSDTO);
-//        model.addAttribute("medicalRecords", medicalRecordShortDTOSDTO);
-
         if(!model.containsAttribute("medicalRecordForm"))
         {
             MedicalRecordAddForm medicalRecordAddForm = new MedicalRecordAddForm();
@@ -252,7 +218,7 @@ public class MedicalController {
         return "prescription_details";
     }
     @GetMapping("/prescriptions/management")
-    public String managePrescriptions() throws RefreshTokenException, JwtValidationException {
+    public String managePrescriptions(){
 
         return "prescription_management";
     }

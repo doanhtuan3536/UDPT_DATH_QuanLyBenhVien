@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:doanhtuan3536/config-repo-doanth.git
+#          ignore-local-ssh-settings: true
+          private-key-path: ${GIT_SSH_KEY}
+#  security:
+#    user:
+#      name: ${CONFIG_USERNAME}
+#      password: ${CONFIG_PASS}
+
+server:
+  port: 8888
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+encrypt:
+  key: mySecretKey123456:
